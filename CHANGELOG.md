@@ -1,5 +1,10 @@
 # Change Log
 
+**Version 1.1.0**
+
+###### Deprecation info
+ - 
+
 **Version 1.0.0**
 
 ###### Areas of improvement

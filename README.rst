@@ -1,18 +1,15 @@
-.. raw:: html
+Segmentation Models Keras
+=========================
 
-    <p align="center">
-      <img src="https://i.ibb.co/GtxGS8m/Segmentation-Models-V1-Side-3-1.png">
-      <b>Python library with Neural Networks for Image Segmentation based on <a href=https://www.keras.io>Keras</a> and <a href=https://www.tensorflow.org>TensorFlow</a>.
-      </b>
-      <br></br>
+This is a fork of original `segmentation_models` library by Pavel Iakubovskii,
+which is not maintained anymore.
 
-      <a href="https://badge.fury.io/py/segmentation-models" alt="PyPI">
-        <img src="https://badge.fury.io/py/segmentation-models.svg" /></a>
-      <a href="https://segmentation-models.readthedocs.io/en/latest/?badge=latest" alt="Documentation">
-        <img src="https://readthedocs.org/projects/segmentation-models/badge/?version=latest" /></a>
-      <a href="https://travis-ci.com/qubvel/segmentation_models" alt="Build Status">
-        <img src="https://travis-ci.com/qubvel/segmentation_models.svg?branch=master" /></a>
-    </p>
+This fork is updated to support latest versions of Keras and TensorFlow, and also
+contains some bug fixes and improvements.
+
+It is not meant as a full replacement of the original library, but rather as a
+solution for a library I depeloped and depended on segmentation_models:
+[orthoseg](https://github.com/orthoseg/orthoseg).
 
 
 **The main features** of this library are:
