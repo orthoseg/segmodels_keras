@@ -1,15 +1,18 @@
-Segmentation Models Keras
+segmodels_keras
 =========================
 
-This is a fork of original `segmentation_models` library by Pavel Iakubovskii,
-which is not maintained anymore.
+This is a fork of the
+[segmentation_models](https://github.com/qubvel/segmentation_models) library by
+Pavel Iakubovskii, which is not maintained anymore.
 
 This fork is updated to support latest versions of Keras and TensorFlow, and also
 contains some bug fixes and improvements.
 
 It is not meant as a full replacement of the original library, but rather as a
-solution for a library I depeloped and depended on segmentation_models:
+solution for a library I developed and depended on segmentation_models:
 [orthoseg](https://github.com/orthoseg/orthoseg).
+
+Hence, backwards compatibility,... is not guaranteed or even an explicit goal.
 
 
 **The main features** of this library are:
@@ -22,12 +25,6 @@ solution for a library I depeloped and depended on segmentation_models:
    convergence
 - Helpful segmentation losses (Jaccard, Dice, Focal) and metrics (IoU, F-score)
 
-**Important note**
-
-    Some models of version ``1.*`` are not compatible with previously trained models,
-    if you have such models and want to load them - roll back with:
-
-    $ pip install -U segmentation-models==0.2.1
 
 Table of Contents
 ~~~~~~~~~~~~~~~~~
