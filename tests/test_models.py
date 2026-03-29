@@ -4,12 +4,12 @@ import random
 import six
 import numpy as np
 
-import segmentation_models_keras as sm
-from segmentation_models_keras import Unet
-from segmentation_models_keras import Linknet
-from segmentation_models_keras import PSPNet
-from segmentation_models_keras import FPN
-from segmentation_models_keras import get_available_backbone_names
+import segmodels_keras as sm
+from segmodels_keras import Unet
+from segmodels_keras import Linknet
+from segmodels_keras import PSPNet
+from segmodels_keras import FPN
+from segmodels_keras import get_available_backbone_names
 
 if sm.framework() == sm._TF_KERAS_FRAMEWORK_NAME:
     from tensorflow import keras

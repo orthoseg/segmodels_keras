@@ -1,9 +1,9 @@
 import pytest
 import numpy as np
 
-import segmentation_models_keras as sm
-from segmentation_models_keras.metrics import IOUScore, FScore
-from segmentation_models_keras.losses import JaccardLoss, DiceLoss
+import segmodels_keras as sm
+from segmodels_keras.metrics import IOUScore, FScore
+from segmodels_keras.losses import JaccardLoss, DiceLoss
 
 if sm.framework() == sm._TF_KERAS_FRAMEWORK_NAME:
     from tensorflow import keras
