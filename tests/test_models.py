@@ -32,10 +32,10 @@ def get_backbones():
 BACKBONES = get_backbones()
 
 
-def _select_names(names):
+def _test_backbones(names):
     is_full = str2bool(os.environ.get("FULL_TEST", "False"))
     if not is_full:
-        return ["resnet50", "inceptionresnetv2", "efficientnetb0"]
+        return ["resnet50", "inceptionresnetv2", "efficientnetb0", "efficientnetv2m"]
     else:
         return names
 
@@ -89,7 +89,7 @@ def _test_shape(model_fn, backbone, input_shape, *args, **kwargs):
     assert x.shape[:-1] == y.shape[:-1]
 
 
-@pytest.mark.parametrize("backbone", _select_names(BACKBONES))
+@pytest.mark.parametrize("backbone", _test_backbones(BACKBONES))
 def test_unet(backbone):
     _test_none_shape(Unet, backbone, encoder_weights=None)
 
@@ -98,7 +98,7 @@ def test_unet(backbone):
     _test_shape(Unet, backbone, input_shape=(256, 256, 4), encoder_weights=None)
 
 
-@pytest.mark.parametrize("backbone", _select_names(BACKBONES))
+@pytest.mark.parametrize("backbone", _test_backbones(BACKBONES))
 def test_linknet(backbone):
     _test_none_shape(Linknet, backbone, encoder_weights=None)
 
@@ -107,7 +107,7 @@ def test_linknet(backbone):
     _test_shape(Linknet, backbone, input_shape=(256, 256, 4), encoder_weights=None)
 
 
-@pytest.mark.parametrize("backbone", _select_names(BACKBONES))
+@pytest.mark.parametrize("backbone", _test_backbones(BACKBONES))
 def test_pspnet(backbone):
 
     _test_shape(PSPNet, backbone, input_shape=(384, 384, 4), encoder_weights=None)
@@ -115,7 +115,7 @@ def test_pspnet(backbone):
     _test_shape(PSPNet, backbone, input_shape=(384, 384, 3), encoder_weights="imagenet")
 
 
-@pytest.mark.parametrize("backbone", _select_names(BACKBONES))
+@pytest.mark.parametrize("backbone", _test_backbones(BACKBONES))
 def test_fpn(backbone):
     _test_none_shape(FPN, backbone, encoder_weights=None)
 
