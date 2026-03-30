@@ -10,6 +10,7 @@
      - seresnext50, seresnext101, senet154
 
 ###### Areas of improvement
+ - Add extra backbones: resnet50v2, resnet101v2, resnet152v2 and efficientnetv2m (#6)
  - Use/support more recent versions of keras (#5)
  - General code improvements by using ruff (#4)
 
