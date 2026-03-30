@@ -1,12 +1,9 @@
-from keras import backend
-from keras import layers
-from keras import models
+from keras import backend, layers, models
 from keras import utils as keras_utils
 
+from ..backbones.backbones_factory import Backbones
 from ._common_blocks import Conv2dBn
 from ._utils import freeze_model
-from ..backbones.backbones_factory import Backbones
-
 
 # ---------------------------------------------------------------------
 #  Utility functions
@@ -46,10 +43,10 @@ def Conv3x3BnReLU(filters, use_batchnorm, name=None):
 
 
 def DecoderUpsamplingX2Block(filters, stage, use_batchnorm=False):
-    up_name = "decoder_stage{}_upsampling".format(stage)
-    conv1_name = "decoder_stage{}a".format(stage)
-    conv2_name = "decoder_stage{}b".format(stage)
-    concat_name = "decoder_stage{}_concat".format(stage)
+    up_name = f"decoder_stage{stage}_upsampling"
+    conv1_name = f"decoder_stage{stage}a"
+    conv2_name = f"decoder_stage{stage}b"
+    concat_name = f"decoder_stage{stage}_concat"
 
     concat_axis = 3 if backend.image_data_format() == "channels_last" else 1
 
@@ -68,11 +65,11 @@ def DecoderUpsamplingX2Block(filters, stage, use_batchnorm=False):
 
 
 def DecoderTransposeX2Block(filters, stage, use_batchnorm=False):
-    transp_name = "decoder_stage{}a_transpose".format(stage)
-    bn_name = "decoder_stage{}a_bn".format(stage)
-    relu_name = "decoder_stage{}a_relu".format(stage)
-    conv_block_name = "decoder_stage{}b".format(stage)
-    concat_name = "decoder_stage{}_concat".format(stage)
+    transp_name = f"decoder_stage{stage}a_transpose"
+    bn_name = f"decoder_stage{stage}a_bn"
+    relu_name = f"decoder_stage{stage}a_relu"
+    conv_block_name = f"decoder_stage{stage}b"
+    concat_name = f"decoder_stage{stage}_concat"
 
     concat_axis = bn_axis = 3 if backend.image_data_format() == "channels_last" else 1
 
@@ -183,28 +180,33 @@ def Unet(
     """Unet_ is a fully convolution neural network for image semantic segmentation
 
     Args:
-        backbone_name: name of classification model (without last dense layers) used as feature
-            extractor to build segmentation model.
+        backbone_name: name of classification model (without last dense layers) used as
+            feature extractor to build segmentation model.
         input_shape: shape of input data/image ``(H, W, C)``, in general
-            case you do not need to set ``H`` and ``W`` shapes, just pass ``(None, None, C)`` to make your model be
-            able to process images af any size, but ``H`` and ``W`` of input images should be divisible by factor ``32``.
+            case you do not need to set ``H`` and ``W`` shapes, just pass
+            ``(None, None, C)`` to make your model be able to process images of any
+            size, but ``H`` and ``W`` of input images should be divisible by
+            factor ``32``.
         classes: a number of classes for output (output shape - ``(h, w, classes)``).
         activation: name of one of ``keras.activations`` for last model layer
             (e.g. ``sigmoid``, ``softmax``, ``linear``).
         weights: optional, path to model weights.
-        encoder_weights: one of ``None`` (random initialization), ``imagenet`` (pre-training on ImageNet).
-        encoder_freeze: if ``True`` set all layers of encoder (backbone model) as non-trainable.
-        encoder_features: a list of layer numbers or names starting from top of the model.
-            Each of these layers will be concatenated with corresponding decoder block. If ``default`` is used
-            layer names are taken from ``DEFAULT_SKIP_CONNECTIONS``.
+        encoder_weights: one of ``None`` (random initialization), ``imagenet``
+            (pre-training on ImageNet).
+        encoder_freeze: if ``True`` set all layers of encoder (backbone model) as
+            non-trainable.
+        encoder_features: a list of layer numbers or names starting from top of the
+            model. Each of these layers will be concatenated with corresponding decoder
+            block. If ``default`` is used layer names are taken from
+            ``DEFAULT_SKIP_CONNECTIONS``.
         decoder_block_type: one of blocks with following layers structure:
 
             - `upsampling`:  ``UpSampling2D`` -> ``Conv2D`` -> ``Conv2D``
             - `transpose`:   ``Transpose2D`` -> ``Conv2D``
 
         decoder_filters: list of numbers of ``Conv2D`` layer filters in decoder blocks
-        decoder_use_batchnorm: if ``True``, ``BatchNormalisation`` layer between ``Conv2D`` and ``Activation`` layers
-            is used.
+        decoder_use_batchnorm: if ``True``, ``BatchNormalisation`` layer between
+            ``Conv2D`` and ``Activation`` layers is used.
 
     Returns:
         ``keras.models.Model``: **Unet**
@@ -220,7 +222,7 @@ def Unet(
     else:
         raise ValueError(
             'Decoder block type should be in ("upsampling", "transpose"). '
-            "Got: {}".format(decoder_block_type)
+            f"Got: {decoder_block_type}"
         )
 
     backbone = Backbones.get_backbone(

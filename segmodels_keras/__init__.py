@@ -1,7 +1,5 @@
-import os
 import functools
-from .__version__ import __version__
-from . import base
+import os
 
 _KERAS_FRAMEWORK_NAME = "keras"
 _TF_KERAS_FRAMEWORK_NAME = "tf.keras"
@@ -109,19 +107,17 @@ except ImportError:
     )
     set_framework(other)
 
-print("Segmentation Models: using `{}` framework.".format(_KERAS_FRAMEWORK))
+print(f"Segmentation Models: using `{_KERAS_FRAMEWORK}` framework.")
 
 # import helper modules
-from . import losses
-from . import metrics
-from . import utils
+from . import losses, metrics, utils
 
 # wrap segmentation models with framework modules
 from .backbones.backbones_factory import Backbones
-from .models.unet import Unet as _Unet
-from .models.pspnet import PSPNet as _PSPNet
-from .models.linknet import Linknet as _Linknet
 from .models.fpn import FPN as _FPN
+from .models.linknet import Linknet as _Linknet
+from .models.pspnet import PSPNet as _PSPNet
+from .models.unet import Unet as _Unet
 
 Unet = inject_global_submodules(_Unet)
 PSPNet = inject_global_submodules(_PSPNet)
@@ -142,16 +138,16 @@ def get_preprocessing(name):
 
 
 __all__ = [
-    "Unet",
-    "PSPNet",
     "FPN",
     "Linknet",
-    "set_framework",
+    "PSPNet",
+    "Unet",
+    "__version__",
     "framework",
-    "get_preprocessing",
     "get_available_backbone_names",
+    "get_preprocessing",
     "losses",
     "metrics",
+    "set_framework",
     "utils",
-    "__version__",
 ]

@@ -1,29 +1,28 @@
-from keras import backend
-from keras import layers
-from keras import models
+from keras import backend, layers, models
 from keras import utils as keras_utils
 
+from ..backbones.backbones_factory import Backbones
 from ._common_blocks import Conv2dBn
 from ._utils import freeze_model
-from ..backbones.backbones_factory import Backbones
-
 
 # ---------------------------------------------------------------------
 #  Utility functions
 # ---------------------------------------------------------------------
 
+
 def get_submodules():
     return {
-        'backend': backend,
-        'models': models,
-        'layers': layers,
-        'utils': keras_utils,
+        "backend": backend,
+        "models": models,
+        "layers": layers,
+        "utils": keras_utils,
     }
 
 
 # ---------------------------------------------------------------------
 #  Blocks
 # ---------------------------------------------------------------------
+
 
 def Conv3x3BnReLU(filters, use_batchnorm, name=None):
     kwargs = get_submodules()
@@ -32,12 +31,12 @@ def Conv3x3BnReLU(filters, use_batchnorm, name=None):
         return Conv2dBn(
             filters,
             kernel_size=3,
-            activation='relu',
-            kernel_initializer='he_uniform',
-            padding='same',
+            activation="relu",
+            kernel_initializer="he_uniform",
+            padding="same",
             use_batchnorm=use_batchnorm,
             name=name,
-            **kwargs
+            **kwargs,
         )(input_tensor)
 
     return wrapper
@@ -50,31 +49,35 @@ def Conv1x1BnReLU(filters, use_batchnorm, name=None):
         return Conv2dBn(
             filters,
             kernel_size=1,
-            activation='relu',
-            kernel_initializer='he_uniform',
-            padding='same',
+            activation="relu",
+            kernel_initializer="he_uniform",
+            padding="same",
             use_batchnorm=use_batchnorm,
             name=name,
-            **kwargs
+            **kwargs,
         )(input_tensor)
 
     return wrapper
 
 
 def DecoderUpsamplingX2Block(filters, stage, use_batchnorm):
-    conv_block1_name = 'decoder_stage{}a'.format(stage)
-    conv_block2_name = 'decoder_stage{}b'.format(stage)
-    conv_block3_name = 'decoder_stage{}c'.format(stage)
-    up_name = 'decoder_stage{}_upsampling'.format(stage)
-    add_name = 'decoder_stage{}_add'.format(stage)
+    conv_block1_name = f"decoder_stage{stage}a"
+    conv_block2_name = f"decoder_stage{stage}b"
+    conv_block3_name = f"decoder_stage{stage}c"
+    up_name = f"decoder_stage{stage}_upsampling"
+    add_name = f"decoder_stage{stage}_add"
 
-    channels_axis = 3 if backend.image_data_format() == 'channels_last' else 1
+    channels_axis = 3 if backend.image_data_format() == "channels_last" else 1
 
     def wrapper(input_tensor, skip=None):
         input_filters = backend.int_shape(input_tensor)[channels_axis]
-        output_filters = backend.int_shape(skip)[channels_axis] if skip is not None else filters
+        output_filters = (
+            backend.int_shape(skip)[channels_axis] if skip is not None else filters
+        )
 
-        x = Conv1x1BnReLU(input_filters // 4, use_batchnorm, name=conv_block1_name)(input_tensor)
+        x = Conv1x1BnReLU(input_filters // 4, use_batchnorm, name=conv_block1_name)(
+            input_tensor
+        )
         x = layers.UpSampling2D((2, 2), name=up_name)(x)
         x = Conv3x3BnReLU(input_filters // 4, use_batchnorm, name=conv_block2_name)(x)
         x = Conv1x1BnReLU(output_filters, use_batchnorm, name=conv_block3_name)(x)
@@ -87,25 +90,29 @@ def DecoderUpsamplingX2Block(filters, stage, use_batchnorm):
 
 
 def DecoderTransposeX2Block(filters, stage, use_batchnorm):
-    conv_block1_name = 'decoder_stage{}a'.format(stage)
-    transpose_name = 'decoder_stage{}b_transpose'.format(stage)
-    bn_name = 'decoder_stage{}b_bn'.format(stage)
-    relu_name = 'decoder_stage{}b_relu'.format(stage)
-    conv_block3_name = 'decoder_stage{}c'.format(stage)
-    add_name = 'decoder_stage{}_add'.format(stage)
+    conv_block1_name = f"decoder_stage{stage}a"
+    transpose_name = f"decoder_stage{stage}b_transpose"
+    bn_name = f"decoder_stage{stage}b_bn"
+    relu_name = f"decoder_stage{stage}b_relu"
+    conv_block3_name = f"decoder_stage{stage}c"
+    add_name = f"decoder_stage{stage}_add"
 
-    channels_axis = bn_axis = 3 if backend.image_data_format() == 'channels_last' else 1
+    channels_axis = bn_axis = 3 if backend.image_data_format() == "channels_last" else 1
 
     def wrapper(input_tensor, skip=None):
         input_filters = backend.int_shape(input_tensor)[channels_axis]
-        output_filters = backend.int_shape(skip)[channels_axis] if skip is not None else filters
+        output_filters = (
+            backend.int_shape(skip)[channels_axis] if skip is not None else filters
+        )
 
-        x = Conv1x1BnReLU(input_filters // 4, use_batchnorm, name=conv_block1_name)(input_tensor)
+        x = Conv1x1BnReLU(input_filters // 4, use_batchnorm, name=conv_block1_name)(
+            input_tensor
+        )
         x = layers.Conv2DTranspose(
             filters=input_filters // 4,
             kernel_size=(4, 4),
             strides=(2, 2),
-            padding='same',
+            padding="same",
             name=transpose_name,
             use_bias=not use_batchnorm,
         )(x)
@@ -113,7 +120,7 @@ def DecoderTransposeX2Block(filters, stage, use_batchnorm):
         if use_batchnorm:
             x = layers.BatchNormalization(axis=bn_axis, name=bn_name)(x)
 
-        x = layers.Activation('relu', name=relu_name)(x)
+        x = layers.Activation("relu", name=relu_name)(x)
         x = Conv1x1BnReLU(output_filters, use_batchnorm, name=conv_block3_name)(x)
 
         if skip is not None:
@@ -128,45 +135,51 @@ def DecoderTransposeX2Block(filters, stage, use_batchnorm):
 #  LinkNet Decoder
 # ---------------------------------------------------------------------
 
+
 def build_linknet(
-        backbone,
-        decoder_block,
-        skip_connection_layers,
-        decoder_filters=(256, 128, 64, 32, 16),
-        n_upsample_blocks=5,
-        classes=1,
-        activation='sigmoid',
-        use_batchnorm=True,
+    backbone,
+    decoder_block,
+    skip_connection_layers,
+    decoder_filters=(256, 128, 64, 32, 16),
+    n_upsample_blocks=5,
+    classes=1,
+    activation="sigmoid",
+    use_batchnorm=True,
 ):
     input_ = backbone.input
     x = backbone.output
 
     # extract skip connections
-    skips = ([backbone.get_layer(name=i).output if isinstance(i, str)
-              else backbone.get_layer(index=i).output for i in skip_connection_layers])
+    skips = [
+        backbone.get_layer(name=i).output
+        if isinstance(i, str)
+        else backbone.get_layer(index=i).output
+        for i in skip_connection_layers
+    ]
 
     # add center block if previous operation was maxpooling (for vgg models)
     if isinstance(backbone.layers[-1], layers.MaxPooling2D):
-        x = Conv3x3BnReLU(512, use_batchnorm, name='center_block1')(x)
-        x = Conv3x3BnReLU(512, use_batchnorm, name='center_block2')(x)
+        x = Conv3x3BnReLU(512, use_batchnorm, name="center_block1")(x)
+        x = Conv3x3BnReLU(512, use_batchnorm, name="center_block2")(x)
 
     # building decoder blocks
     for i in range(n_upsample_blocks):
-
         if i < len(skips):
             skip = skips[i]
         else:
             skip = None
 
-        x = decoder_block(decoder_filters[i], stage=i, use_batchnorm=use_batchnorm)(x, skip)
+        x = decoder_block(decoder_filters[i], stage=i, use_batchnorm=use_batchnorm)(
+            x, skip
+        )
 
     # model head (define number of output classes)
     x = layers.Conv2D(
         filters=classes,
         kernel_size=(3, 3),
-        padding='same',
+        padding="same",
         use_bias=True,
-        kernel_initializer='glorot_uniform'
+        kernel_initializer="glorot_uniform",
     )(x)
     x = layers.Activation(activation, name=activation)(x)
 
@@ -180,45 +193,51 @@ def build_linknet(
 #  LinkNet Model
 # ---------------------------------------------------------------------
 
+
 def Linknet(
-        backbone_name='vgg16',
-        input_shape=(None, None, 3),
-        classes=1,
-        activation='sigmoid',
-        weights=None,
-        encoder_weights='imagenet',
-        encoder_freeze=False,
-        encoder_features='default',
-        decoder_block_type='upsampling',
-        decoder_filters=(None, None, None, None, 16),
-        decoder_use_batchnorm=True,
-        **kwargs
+    backbone_name="vgg16",
+    input_shape=(None, None, 3),
+    classes=1,
+    activation="sigmoid",
+    weights=None,
+    encoder_weights="imagenet",
+    encoder_freeze=False,
+    encoder_features="default",
+    decoder_block_type="upsampling",
+    decoder_filters=(None, None, None, None, 16),
+    decoder_use_batchnorm=True,
+    **kwargs,
 ):
-    """Linknet_ is a fully convolution neural network for fast image semantic segmentation
+    """Linknet_ is a fully convolution neural network for fast semantic segmentation.
 
     Note:
         This implementation by default has 4 skip connections (original - 3).
 
     Args:
-        backbone_name: name of classification model (without last dense layers) used as feature
-                    extractor to build segmentation model.
-        input_shape: shape of input data/image ``(H, W, C)``, in general
-                case you do not need to set ``H`` and ``W`` shapes, just pass ``(None, None, C)`` to make your model be
-                able to process images af any size, but ``H`` and ``W`` of input images should be divisible by factor ``32``.
+        backbone_name: name of classification model (without last dense layers) used as
+            feature extractor to build segmentation model.
+        input_shape: shape of input data/image ``(H, W, C)``, in general case you do not
+            need to set ``H`` and ``W`` shapes, just pass ``(None, None, C)`` to make
+            your model be able to process images af any size, but ``H`` and ``W`` of
+            input images should be divisible by factor ``32``.
         classes: a number of classes for output (output shape - ``(h, w, classes)``).
         activation: name of one of ``keras.activations`` for last model layer
             (e.g. ``sigmoid``, ``softmax``, ``linear``).
         weights: optional, path to model weights.
-        encoder_weights: one of ``None`` (random initialization), ``imagenet`` (pre-training on ImageNet).
-        encoder_freeze: if ``True`` set all layers of encoder (backbone model) as non-trainable.
-        encoder_features: a list of layer numbers or names starting from top of the model.
-                    Each of these layers will be concatenated with corresponding decoder block. If ``default`` is used
-                    layer names are taken from ``DEFAULT_SKIP_CONNECTIONS``.
+        encoder_weights: one of ``None`` (random initialization), ``imagenet``
+            (pre-training on ImageNet).
+        encoder_freeze: if ``True`` set all layers of encoder (backbone model) as
+            non-trainable.
+        encoder_features: a list of layer numbers or names starting from top of the
+            model. Each of these layers will be concatenated with corresponding decoder
+            block. If ``default`` is used layer names are taken from
+            ``DEFAULT_SKIP_CONNECTIONS``.
         decoder_filters: list of numbers of ``Conv2D`` layer filters in decoder blocks,
-            for block with skip connection a number of filters is equal to number of filters in
-            corresponding encoder block (estimates automatically and can be passed as ``None`` value).
-        decoder_use_batchnorm: if ``True``, ``BatchNormalisation`` layer between ``Conv2D`` and ``Activation`` layers
-                    is used.
+            for block with skip connection a number of filters is equal to number of
+            filters in corresponding encoder block (estimates automatically and can be
+            passed as ``None`` value).
+        decoder_use_batchnorm: if ``True``, ``BatchNormalisation`` layer between
+            ``Conv2D`` and ``Activation`` layers is used.
         decoder_block_type: one of
                     - `upsampling`:  use ``UpSampling2D`` keras layer
                     - `transpose`:   use ``Transpose2D`` keras layer
@@ -231,11 +250,13 @@ def Linknet(
     """
     if decoder_block_type == 'upsampling':
         decoder_block = DecoderUpsamplingX2Block
-    elif decoder_block_type == 'transpose':
+    elif decoder_block_type == "transpose":
         decoder_block = DecoderTransposeX2Block
     else:
-        raise ValueError('Decoder block type should be in ("upsampling", "transpose"). '
-                         'Got: {}'.format(decoder_block_type))
+        raise ValueError(
+            'Decoder block type should be in ("upsampling", "transpose"). '
+            f"Got: {decoder_block_type}"
+        )
 
     backbone = Backbones.get_backbone(
         backbone_name,
@@ -245,7 +266,7 @@ def Linknet(
         **kwargs,
     )
 
-    if encoder_features == 'default':
+    if encoder_features == "default":
         encoder_features = Backbones.get_feature_layers(backbone_name, n=4)
 
     model = build_linknet(

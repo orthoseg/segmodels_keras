@@ -18,7 +18,6 @@ from keras import layers
 from keras import models
 from keras import utils as keras_utils
 from keras_applications import imagenet_utils
-from keras_applications import get_submodules_from_kwargs
 
 WEIGHTS_PATH = (
     "https://github.com/fchollet/deep-learning-models/"
@@ -144,11 +143,10 @@ def InceptionV3(
 
     if input_tensor is None:
         img_input = layers.Input(shape=input_shape)
+    elif not backend.is_keras_tensor(input_tensor):
+        img_input = layers.Input(tensor=input_tensor, shape=input_shape)
     else:
-        if not backend.is_keras_tensor(input_tensor):
-            img_input = layers.Input(tensor=input_tensor, shape=input_shape)
-        else:
-            img_input = input_tensor
+        img_input = input_tensor
 
     if backend.image_data_format() == "channels_first":
         channel_axis = 1
@@ -338,11 +336,10 @@ def InceptionV3(
         # Classification block
         x = layers.GlobalAveragePooling2D(name="avg_pool")(x)
         x = layers.Dense(classes, activation="softmax", name="predictions")(x)
-    else:
-        if pooling == "avg":
-            x = layers.GlobalAveragePooling2D()(x)
-        elif pooling == "max":
-            x = layers.GlobalMaxPooling2D()(x)
+    elif pooling == "avg":
+        x = layers.GlobalAveragePooling2D()(x)
+    elif pooling == "max":
+        x = layers.GlobalMaxPooling2D()(x)
 
     # Ensure that the model takes into account
     # any potential predecessors of `input_tensor`.

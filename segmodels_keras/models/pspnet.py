@@ -3,9 +3,9 @@ from keras import layers
 from keras import models
 from keras import utils as keras_utils
 
+from ..backbones.backbones_factory import Backbones
 from ._common_blocks import Conv2dBn
 from ._utils import freeze_model
-from ..backbones.backbones_factory import Backbones
 
 # ---------------------------------------------------------------------
 #  Utility functions
@@ -38,8 +38,8 @@ def check_input_shape(input_shape, factor):
 
     if is_wrong_shape:
         raise ValueError(
-            "Wrong shape {}, input H and W should ".format(input_shape)
-            + "be divisible by `{}`".format(min_size)
+            f"Wrong shape {input_shape}, input H and W should "
+            f"be divisible by `{min_size}`"
         )
 
 
@@ -74,15 +74,14 @@ def SpatialContextBlock(
 ):
     if pooling_type not in ("max", "avg"):
         raise ValueError(
-            "Unsupported pooling type - `{}`.".format(pooling_type)
-            + "Use `avg` or `max`."
+            f"Unsupported pooling type - `{pooling_type}`.Use `avg` or `max`."
         )
 
     Pooling2D = layers.MaxPool2D if pooling_type == "max" else layers.AveragePooling2D
 
-    pooling_name = "psp_level{}_pooling".format(level)
-    conv_block_name = "psp_level{}".format(level)
-    upsampling_name = "psp_level{}_upsampling".format(level)
+    pooling_name = f"psp_level{level}_pooling"
+    conv_block_name = f"psp_level{level}"
+    upsampling_name = f"psp_level{level}_upsampling"
 
     def wrapper(input_tensor):
         # extract input feature maps size (h, and w dimensions)
@@ -93,10 +92,11 @@ def SpatialContextBlock(
             else input_shape[2:]
         )
 
-        # Compute the kernel and stride sizes according to how large the final feature map will be
-        # When the kernel factor and strides are equal, then we can compute the final feature map factor
-        # by simply dividing the current factor by the kernel or stride factor
-        # The final feature map sizes are 1x1, 2x2, 3x3, and 6x6.
+        # Compute the kernel and stride sizes according to how large the final feature
+        # map will be when the kernel factor and strides are equal, then we can compute
+        # the final feature map factor by simply dividing the current factor by the
+        # kernel or stride factor the final feature map sizes are 1x1, 2x2, 3x3, and
+        # 6x6.
         pool_size = up_size = [spatial_size[0] // level, spatial_size[1] // level]
 
         x = Pooling2D(pool_size, strides=pool_size, padding="same", name=pooling_name)(
@@ -194,19 +194,23 @@ def PSPNet(
         backbone_name: name of classification model used as feature
                 extractor to build segmentation model.
         input_shape: shape of input data/image ``(H, W, C)``.
-            ``H`` and ``W`` should be divisible by ``6 * downsample_factor`` and **NOT** ``None``!
+            ``H`` and ``W`` should be divisible by ``6 * downsample_factor`` and
+            **NOT** ``None``!
         classes: a number of classes for output (output shape - ``(h, w, classes)``).
         activation: name of one of ``keras.activations`` for last model layer
-                (e.g. ``sigmoid``, ``softmax``, ``linear``).
+            (e.g. ``sigmoid``, ``softmax``, ``linear``).
         weights: optional, path to model weights.
-        encoder_weights: one of ``None`` (random initialization), ``imagenet`` (pre-training on ImageNet).
-        encoder_freeze: if ``True`` set all layers of encoder (backbone model) as non-trainable.
-        downsample_factor: one of 4, 8 and 16. Downsampling rate or in other words backbone depth
-            to construct PSP module on it.
+        encoder_weights: one of ``None`` (random initialization), ``imagenet``
+            (pre-training on ImageNet).
+        encoder_freeze: if ``True`` set all layers of encoder (backbone model) as
+            non-trainable.
+        downsample_factor: one of 4, 8 and 16. Downsampling rate or in other words
+            backbone depth to construct PSP module on it.
         psp_conv_filters: number of filters in ``Conv2D`` layer in each PSP block.
-        psp_pooling_type: one of 'avg', 'max'. PSP block pooling type (maximum or average).
-        psp_use_batchnorm: if ``True``, ``BatchNormalisation`` layer between ``Conv2D`` and ``Activation`` layers
-                is used.
+        psp_pooling_type: one of 'avg', 'max'. PSP block pooling type
+            (maximum or average).
+        psp_use_batchnorm: if ``True``, ``BatchNormalisation`` layer between ``Conv2D``
+            and ``Activation`` layers is used.
         psp_dropout: dropout rate between 0 and 1.
 
     Returns:
@@ -236,9 +240,7 @@ def PSPNet(
     elif downsample_factor == 4:
         psp_layer_idx = feature_layers[2]
     else:
-        raise ValueError(
-            "Unsupported factor - `{}`, Use 4, 8 or 16.".format(downsample_factor)
-        )
+        raise ValueError(f"Unsupported factor - `{downsample_factor}`, Use 4, 8 or 16.")
 
     model = build_psp(
         backbone,

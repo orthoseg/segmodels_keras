@@ -11,21 +11,18 @@ https://github.com/tensorflow/models/tree/master/research/slim#pre-trained-model
    Residual Connections on Learning](https://arxiv.org/abs/1602.07261) (AAAI 2017)
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import os
 
-from keras import backend
-from keras import layers
-from keras import models
-from keras import utils as keras_utils
-from keras_applications import imagenet_utils
+from keras_applications import get_submodules_from_kwargs, imagenet_utils
 
 BASE_WEIGHT_URL = (
     "https://github.com/fchollet/deep-learning-models/releases/download/v0.7/"
 )
+
+backend = None
+layers = None
+models = None
+keras_utils = None
 
 
 def preprocess_input(x, **kwargs):
@@ -212,6 +209,9 @@ def InceptionResNetV2(
         ValueError: in case of invalid argument for `weights`,
             or invalid input shape.
     """
+    global backend, layers, models, keras_utils
+    backend, layers, models, keras_utils = get_submodules_from_kwargs(kwargs)
+
     if not (weights in {"imagenet", None} or os.path.exists(weights)):
         raise ValueError(
             "The `weights` argument should be either "
@@ -238,11 +238,10 @@ def InceptionResNetV2(
 
     if input_tensor is None:
         img_input = layers.Input(shape=input_shape)
+    elif not backend.is_keras_tensor(input_tensor):
+        img_input = layers.Input(tensor=input_tensor, shape=input_shape)
     else:
-        if not backend.is_keras_tensor(input_tensor):
-            img_input = layers.Input(tensor=input_tensor, shape=input_shape)
-        else:
-            img_input = input_tensor
+        img_input = input_tensor
 
     # Stem block: 35 x 35 x 192
     x = conv2d_bn(img_input, 32, 3, strides=2, padding="same")
@@ -315,11 +314,10 @@ def InceptionResNetV2(
         # Classification block
         x = layers.GlobalAveragePooling2D(name="avg_pool")(x)
         x = layers.Dense(classes, activation="softmax", name="predictions")(x)
-    else:
-        if pooling == "avg":
-            x = layers.GlobalAveragePooling2D()(x)
-        elif pooling == "max":
-            x = layers.GlobalMaxPooling2D()(x)
+    elif pooling == "avg":
+        x = layers.GlobalAveragePooling2D()(x)
+    elif pooling == "max":
+        x = layers.GlobalMaxPooling2D()(x)
 
     # Ensure that the model takes into account
     # any potential predecessors of `input_tensor`.

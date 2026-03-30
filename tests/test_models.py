@@ -1,26 +1,22 @@
 import os
-import pytest
-import random
-import six
+
 import numpy as np
+import pytest
+import six
 
 import segmodels_keras as sm
-from segmodels_keras import Unet
-from segmodels_keras import Linknet
-from segmodels_keras import PSPNet
-from segmodels_keras import FPN
-from segmodels_keras import get_available_backbone_names
+from segmodels_keras import FPN, Linknet, PSPNet, Unet, get_available_backbone_names
 
 if sm.framework() == sm._TF_KERAS_FRAMEWORK_NAME:
     from tensorflow import keras
 elif sm.framework() == sm._KERAS_FRAMEWORK_NAME:
     import keras
 else:
-    raise ValueError("Incorrect framework {}".format(sm.framework()))
+    raise ValueError(f"Incorrect framework {sm.framework()}")
 
 
 def get_backbones():
-    is_travis = os.environ.get("TRAVIS", False)
+    is_travis = str2bool(os.environ.get("TRAVIS", "False"))
     exclude = ["efficientnetb6", "efficientnetb7"]
     backbones = get_available_backbone_names()
 
@@ -33,11 +29,15 @@ BACKBONES = get_backbones()
 
 
 def _select_names(names):
-    is_full = os.environ.get("FULL_TEST", False)
+    is_full = str2bool(os.environ.get("FULL_TEST", "False"))
     if not is_full:
         return ["resnet50", "inceptionresnetv2", "efficientnetb0"]
     else:
         return names
+
+
+def str2bool(v):
+    return v.lower() in ("yes", "true", "t", "1")
 
 
 def keras_test(func):
@@ -82,7 +82,7 @@ def _test_shape(model_fn, backbone, input_shape, *args, **kwargs):
     x = np.ones((1, *input_shape))
 
     # define model and process sample
-    model = model_fn(backbone, input_shape=input_shape, *args, **kwargs)
+    model = model_fn(backbone, input_shape=input_shape, *args, **kwargs)  # noqa: B026
     y = model.predict(x)
 
     # check output dimensions

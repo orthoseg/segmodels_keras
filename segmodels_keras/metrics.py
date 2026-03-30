@@ -5,23 +5,29 @@ SMOOTH = 1e-5
 
 
 class IOUScore(Metric):
-    r""" The `Jaccard index`_, also known as Intersection over Union and the Jaccard similarity coefficient
-    (originally coined coefficient de communauté by Paul Jaccard), is a statistic used for comparing the
-    similarity and diversity of sample sets. The Jaccard coefficient measures similarity between finite sample sets,
-    and is defined as the size of the intersection divided by the size of the union of the sample sets:
+    r"""The `Jaccard index`_, also known as Intersection over Union and the Jaccard
+    similarity coefficient (originally coined coefficient de communauté by Paul
+    Jaccard), is a statistic used for comparing the similarity and diversity of sample
+    sets. The Jaccard coefficient measures similarity between finite sample sets,
+    and is defined as the size of the intersection divided by the size of the union of
+    the sample sets:
 
     .. math:: J(A, B) = \frac{A \cap B}{A \cup B}
 
     Args:
-        class_weights: 1. or ``np.array`` of class weights (``len(weights) = num_classes``).
-        class_indexes: Optional integer or list of integers, classes to consider, if ``None`` all classes are used.
+        class_weights: 1. or ``np.array`` of class weights
+            (``len(weights) = num_classes``).
+        class_indexes: Optional integer or list of integers, classes to consider, if
+            ``None`` all classes are used.
         smooth: value to avoid division by zero
         per_image: if ``True``, metric is calculated as mean over images in batch (B),
             else over whole batch
-        threshold: value to round predictions (use ``>`` comparison), if ``None`` prediction will not be round
+        threshold: value to round predictions (use ``>`` comparison), if ``None``
+            prediction will not be round
 
     Returns:
-       A callable ``iou_score`` instance. Can be used in ``model.compile(...)`` function.
+        A callable ``iou_score`` instance. Can be used in ``model.compile(...)``
+            function.
 
     .. _`Jaccard index`: https://en.wikipedia.org/wiki/Jaccard_index
 
@@ -34,15 +40,15 @@ class IOUScore(Metric):
     """
 
     def __init__(
-            self,
-            class_weights=None,
-            class_indexes=None,
-            threshold=None,
-            per_image=False,
-            smooth=SMOOTH,
-            name=None,
+        self,
+        class_weights=None,
+        class_indexes=None,
+        threshold=None,
+        per_image=False,
+        smooth=SMOOTH,
+        name=None,
     ):
-        name = name or 'iou_score'
+        name = name or "iou_score"
         super().__init__(name=name)
         self.class_weights = class_weights if class_weights is not None else 1
         self.class_indexes = class_indexes
@@ -59,14 +65,16 @@ class IOUScore(Metric):
             smooth=self.smooth,
             per_image=self.per_image,
             threshold=self.threshold,
-            **self.submodules
+            **self.submodules,
         )
 
 
 class FScore(Metric):
-    r"""The F-score (Dice coefficient) can be interpreted as a weighted average of the precision and recall,
-    where an F-score reaches its best value at 1 and worst score at 0.
-    The relative contribution of ``precision`` and ``recall`` to the F1-score are equal.
+    r"""The F-score (Dice coefficient) can be interpreted as a weighted average of the
+    precision and recall, where an F-score reaches its best value at 1 and worst score
+    at 0. The relative contribution of ``precision`` and ``recall`` to the F1-score are
+    equal.
+
     The formula for the F score is:
 
     .. math:: F_\beta(precision, recall) = (1 + \beta^2) \frac{precision \cdot recall}
@@ -83,12 +91,15 @@ class FScore(Metric):
 
     Args:
         beta: Integer of float f-score coefficient to balance precision and recall.
-        class_weights: 1. or ``np.array`` of class weights (``len(weights) = num_classes``)
-        class_indexes: Optional integer or list of integers, classes to consider, if ``None`` all classes are used.
+        class_weights: 1. or ``np.array`` of class weights
+            (``len(weights) = num_classes``)
+        class_indexes: Optional integer or list of integers, classes to consider, if
+            ``None`` all classes are used.
         smooth: Float value to avoid division by zero.
         per_image: If ``True``, metric is calculated as mean over images in batch (B),
             else over whole batch.
-        threshold: Float value to round predictions (use ``>`` comparison), if ``None`` prediction will not be round.
+        threshold: Float value to round predictions (use ``>`` comparison), if ``None``
+            prediction will not be round.
         name: Optional string, if ``None`` default ``f{beta}-score`` name is used.
 
     Returns:
@@ -100,19 +111,19 @@ class FScore(Metric):
 
         metric = FScore()
         model.compile('SGD', loss=loss, metrics=[metric])
-    """
+    """  # noqa: E501
 
     def __init__(
-            self,
-            beta=1,
-            class_weights=None,
-            class_indexes=None,
-            threshold=None,
-            per_image=False,
-            smooth=SMOOTH,
-            name=None,
+        self,
+        beta=1,
+        class_weights=None,
+        class_indexes=None,
+        threshold=None,
+        per_image=False,
+        smooth=SMOOTH,
+        name=None,
     ):
-        name = name or 'f{}-score'.format(beta)
+        name = name or f"f{beta}-score"
         super().__init__(name=name)
         self.beta = beta
         self.class_weights = class_weights if class_weights is not None else 1
@@ -131,7 +142,7 @@ class FScore(Metric):
             smooth=self.smooth,
             per_image=self.per_image,
             threshold=self.threshold,
-            **self.submodules
+            **self.submodules,
         )
 
 
@@ -146,16 +157,20 @@ class Precision(Metric):
          - fp - false positives;
 
     Args:
-        class_weights: 1. or ``np.array`` of class weights (``len(weights) = num_classes``).
-        class_indexes: Optional integer or list of integers, classes to consider, if ``None`` all classes are used.
+        class_weights: 1. or ``np.array`` of class weights
+            (``len(weights) = num_classes``).
+        class_indexes: Optional integer or list of integers, classes to consider, if
+            ``None`` all classes are used.
         smooth: Float value to avoid division by zero.
         per_image: If ``True``, metric is calculated as mean over images in batch (B),
             else over whole batch.
-        threshold: Float value to round predictions (use ``>`` comparison), if ``None`` prediction will not be round.
+        threshold: Float value to round predictions (use ``>`` comparison), if ``None``
+            prediction will not be round.
         name: Optional string, if ``None`` default ``precision`` name is used.
 
     Returns:
-        A callable ``precision`` instance. Can be used in ``model.compile(...)`` function.
+        A callable ``precision`` instance. Can be used in ``model.compile(...)``
+            function.
 
     Example:
 
@@ -166,15 +181,15 @@ class Precision(Metric):
     """
 
     def __init__(
-            self,
-            class_weights=None,
-            class_indexes=None,
-            threshold=None,
-            per_image=False,
-            smooth=SMOOTH,
-            name=None,
+        self,
+        class_weights=None,
+        class_indexes=None,
+        threshold=None,
+        per_image=False,
+        smooth=SMOOTH,
+        name=None,
     ):
-        name = name or 'precision'
+        name = name or "precision"
         super().__init__(name=name)
         self.class_weights = class_weights if class_weights is not None else 1
         self.class_indexes = class_indexes
@@ -191,7 +206,7 @@ class Precision(Metric):
             smooth=self.smooth,
             per_image=self.per_image,
             threshold=self.threshold,
-            **self.submodules
+            **self.submodules,
         )
 
 
@@ -206,12 +221,15 @@ class Recall(Metric):
          - fn - false negatives;
 
     Args:
-        class_weights: 1. or ``np.array`` of class weights (``len(weights) = num_classes``).
-        class_indexes: Optional integer or list of integers, classes to consider, if ``None`` all classes are used.
+        class_weights: 1. or ``np.array`` of class weights
+            (``len(weights) = num_classes``).
+        class_indexes: Optional integer or list of integers, classes to consider, if
+            ``None`` all classes are used.
         smooth: Float value to avoid division by zero.
         per_image: If ``True``, metric is calculated as mean over images in batch (B),
             else over whole batch.
-        threshold: Float value to round predictions (use ``>`` comparison), if ``None`` prediction will not be round.
+        threshold: Float value to round predictions (use ``>`` comparison), if ``None``
+            prediction will not be round.
         name: Optional string, if ``None`` default ``recall`` name is used.
 
     Returns:
@@ -226,15 +244,15 @@ class Recall(Metric):
     """
 
     def __init__(
-            self,
-            class_weights=None,
-            class_indexes=None,
-            threshold=None,
-            per_image=False,
-            smooth=SMOOTH,
-            name=None,
+        self,
+        class_weights=None,
+        class_indexes=None,
+        threshold=None,
+        per_image=False,
+        smooth=SMOOTH,
+        name=None,
     ):
-        name = name or 'recall'
+        name = name or "recall"
         super().__init__(name=name)
         self.class_weights = class_weights if class_weights is not None else 1
         self.class_indexes = class_indexes
@@ -251,7 +269,7 @@ class Recall(Metric):
             smooth=self.smooth,
             per_image=self.per_image,
             threshold=self.threshold,
-            **self.submodules
+            **self.submodules,
         )
 
 

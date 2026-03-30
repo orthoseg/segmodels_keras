@@ -10,15 +10,18 @@ class JaccardLoss(Loss):
     .. math:: L(A, B) = 1 - \frac{A \cap B}{A \cup B}
 
     Args:
-        class_weights: Array (``np.array``) of class weights (``len(weights) = num_classes``).
-        class_indexes: Optional integer or list of integers, classes to consider, if ``None`` all classes are used.
-        per_image: If ``True`` loss is calculated for each image in batch and then averaged,
+        class_weights: Array (``np.array``) of class weights
+            (``len(weights) = num_classes``).
+        class_indexes: Optional integer or list of integers, classes to
+            consider, if ``None`` all classes are used.
+        per_image: If ``True`` loss is calculated for each image in batch
+            and then averaged,
             else loss is calculated for the whole batch.
         smooth: Value to avoid division by zero.
 
     Returns:
-         A callable ``jaccard_loss`` instance. Can be used in ``model.compile(...)`` function
-         or combined with other losses.
+         A callable ``jaccard_loss`` instance. Can be used in
+         ``model.compile(...)`` function or combined with other losses.
 
     Example:
 
@@ -28,8 +31,10 @@ class JaccardLoss(Loss):
         model.compile('SGD', loss=loss)
     """
 
-    def __init__(self, class_weights=None, class_indexes=None, per_image=False, smooth=SMOOTH):
-        super().__init__(name='jaccard_loss')
+    def __init__(
+        self, class_weights=None, class_indexes=None, per_image=False, smooth=SMOOTH
+    ):
+        super().__init__(name="jaccard_loss")
         self.class_weights = class_weights if class_weights is not None else 1
         self.class_indexes = class_indexes
         self.per_image = per_image
@@ -44,7 +49,7 @@ class JaccardLoss(Loss):
             smooth=self.smooth,
             per_image=self.per_image,
             threshold=None,
-            **self.submodules
+            **self.submodules,
         )
 
 
@@ -56,7 +61,10 @@ class DiceLoss(Loss):
 
     The formula in terms of *Type I* and *Type II* errors:
 
-    .. math:: L(tp, fp, fn) = \frac{(1 + \beta^2) \cdot tp} {(1 + \beta^2) \cdot fp + \beta^2 \cdot fn + fp}
+    .. math::
+
+        L(tp, fp, fn) = \frac{(1 + \beta^2) \cdot tp}
+            {(1 + \beta^2) \cdot fp + \beta^2 \cdot fn + fp}
 
     where:
          - tp - true positives;
@@ -65,15 +73,17 @@ class DiceLoss(Loss):
 
     Args:
         beta: Float or integer coefficient for precision and recall balance.
-        class_weights: Array (``np.array``) of class weights (``len(weights) = num_classes``).
-        class_indexes: Optional integer or list of integers, classes to consider, if ``None`` all classes are used.
-        per_image: If ``True`` loss is calculated for each image in batch and then averaged,
-        else loss is calculated for the whole batch.
+        class_weights: Array (``np.array``) of class weights
+            (``len(weights) = num_classes``).
+        class_indexes: Optional integer or list of integers, classes to consider, if
+            ``None`` all classes are used.
+        per_image: If ``True`` loss is calculated for each image in batch and then
+            averaged, else loss is calculated for the whole batch.
         smooth: Value to avoid division by zero.
 
     Returns:
-        A callable ``dice_loss`` instance. Can be used in ``model.compile(...)`` function`
-        or combined with other losses.
+        A callable ``dice_loss`` instance. Can be used in ``model.compile(...)``
+        function or combined with other losses.
 
     Example:
 
@@ -83,8 +93,15 @@ class DiceLoss(Loss):
         model.compile('SGD', loss=loss)
     """
 
-    def __init__(self, beta=1, class_weights=None, class_indexes=None, per_image=False, smooth=SMOOTH):
-        super().__init__(name='dice_loss')
+    def __init__(
+        self,
+        beta=1,
+        class_weights=None,
+        class_indexes=None,
+        per_image=False,
+        smooth=SMOOTH,
+    ):
+        super().__init__(name="dice_loss")
         self.beta = beta
         self.class_weights = class_weights if class_weights is not None else 1
         self.class_indexes = class_indexes
@@ -101,19 +118,19 @@ class DiceLoss(Loss):
             smooth=self.smooth,
             per_image=self.per_image,
             threshold=None,
-            **self.submodules
+            **self.submodules,
         )
 
 
 class BinaryCELoss(Loss):
-    """Creates a criterion that measures the Binary Cross Entropy between the
+    r"""Creates a criterion that measures the Binary Cross Entropy between the
     ground truth (gt) and the prediction (pr).
 
     .. math:: L(gt, pr) = - gt \cdot \log(pr) - (1 - gt) \cdot \log(1 - pr)
 
     Returns:
-        A callable ``binary_crossentropy`` instance. Can be used in ``model.compile(...)`` function
-        or combined with other losses.
+        A callable ``binary_crossentropy`` instance. Can be used in
+        ``model.compile(...)`` function or combined with other losses.
 
     Example:
 
@@ -124,25 +141,27 @@ class BinaryCELoss(Loss):
     """
 
     def __init__(self):
-        super().__init__(name='binary_crossentropy')
+        super().__init__(name="binary_crossentropy")
 
     def __call__(self, gt, pr):
         return F.binary_crossentropy(gt, pr, **self.submodules)
 
 
 class CategoricalCELoss(Loss):
-    """Creates a criterion that measures the Categorical Cross Entropy between the
+    r"""Creates a criterion that measures the Categorical Cross Entropy between the
     ground truth (gt) and the prediction (pr).
 
     .. math:: L(gt, pr) = - gt \cdot \log(pr)
 
     Args:
-        class_weights: Array (``np.array``) of class weights (``len(weights) = num_classes``).
-        class_indexes: Optional integer or list of integers, classes to consider, if ``None`` all classes are used.
+        class_weights: Array (``np.array``) of class weights
+            (``len(weights) = num_classes``).
+        class_indexes: Optional integer or list of integers, classes to consider, if
+            ``None`` all classes are used.
 
     Returns:
-        A callable ``categorical_crossentropy`` instance. Can be used in ``model.compile(...)`` function
-        or combined with other losses.
+        A callable ``categorical_crossentropy`` instance. Can be used in
+        ``model.compile(...)`` function or combined with other losses.
 
     Example:
 
@@ -153,7 +172,7 @@ class CategoricalCELoss(Loss):
     """
 
     def __init__(self, class_weights=None, class_indexes=None):
-        super().__init__(name='categorical_crossentropy')
+        super().__init__(name="categorical_crossentropy")
         self.class_weights = class_weights if class_weights is not None else 1
         self.class_indexes = class_indexes
 
@@ -163,7 +182,7 @@ class CategoricalCELoss(Loss):
             pr,
             class_weights=self.class_weights,
             class_indexes=self.class_indexes,
-            **self.submodules
+            **self.submodules,
         )
 
 
@@ -174,13 +193,16 @@ class CategoricalFocalLoss(Loss):
     .. math:: L(gt, pr) = - gt \cdot \alpha \cdot (1 - pr)^\gamma \cdot \log(pr)
 
     Args:
-        alpha: Float or integer, the same as weighting factor in balanced cross entropy, default 0.25.
-        gamma: Float or integer, focusing parameter for modulating factor (1 - p), default 2.0.
-        class_indexes: Optional integer or list of integers, classes to consider, if ``None`` all classes are used.
+        alpha: Float or integer, the same as weighting factor in balanced cross entropy,
+            default 0.25.
+        gamma: Float or integer, focusing parameter for modulating factor (1 - p),
+            default 2.0.
+        class_indexes: Optional integer or list of integers, classes to consider, if
+            ``None`` all classes are used.
 
     Returns:
-        A callable ``categorical_focal_loss`` instance. Can be used in ``model.compile(...)`` function
-        or combined with other losses.
+        A callable ``categorical_focal_loss`` instance. Can be used in
+        ``model.compile(...)`` function or combined with other losses.
 
     Example:
 
@@ -190,8 +212,8 @@ class CategoricalFocalLoss(Loss):
             model.compile('SGD', loss=loss)
     """
 
-    def __init__(self, alpha=0.25, gamma=2., class_indexes=None):
-        super().__init__(name='focal_loss')
+    def __init__(self, alpha=0.25, gamma=2.0, class_indexes=None):
+        super().__init__(name="focal_loss")
         self.alpha = alpha
         self.gamma = gamma
         self.class_indexes = class_indexes
@@ -203,7 +225,7 @@ class CategoricalFocalLoss(Loss):
             alpha=self.alpha,
             gamma=self.gamma,
             class_indexes=self.class_indexes,
-            **self.submodules
+            **self.submodules,
         )
 
 
@@ -211,15 +233,20 @@ class BinaryFocalLoss(Loss):
     r"""Creates a criterion that measures the Binary Focal Loss between the
     ground truth (gt) and the prediction (pr).
 
-    .. math:: L(gt, pr) = - gt \alpha (1 - pr)^\gamma \log(pr) - (1 - gt) \alpha pr^\gamma \log(1 - pr)
+    .. math::
+
+        L(gt, pr) = - gt \alpha (1 - pr)^\gamma \log(pr)
+            - (1 - gt) \alpha pr^\gamma \log(1 - pr)
 
     Args:
-        alpha: Float or integer, the same as weighting factor in balanced cross entropy, default 0.25.
-        gamma: Float or integer, focusing parameter for modulating factor (1 - p), default 2.0.
+        alpha: Float or integer, the same as weighting factor in balanced cross entropy,
+            default 0.25.
+        gamma: Float or integer, focusing parameter for modulating factor (1 - p),
+            default 2.0.
 
     Returns:
-        A callable ``binary_focal_loss`` instance. Can be used in ``model.compile(...)`` function
-        or combined with other losses.
+        A callable ``binary_focal_loss`` instance. Can be used in ``model.compile(...)``
+        function or combined with other losses.
 
     Example:
 
@@ -229,13 +256,15 @@ class BinaryFocalLoss(Loss):
         model.compile('SGD', loss=loss)
     """
 
-    def __init__(self, alpha=0.25, gamma=2.):
-        super().__init__(name='binary_focal_loss')
+    def __init__(self, alpha=0.25, gamma=2.0):
+        super().__init__(name="binary_focal_loss")
         self.alpha = alpha
         self.gamma = gamma
 
     def __call__(self, gt, pr):
-        return F.binary_focal_loss(gt, pr, alpha=self.alpha, gamma=self.gamma, **self.submodules)
+        return F.binary_focal_loss(
+            gt, pr, alpha=self.alpha, gamma=self.gamma, **self.submodules
+        )
 
 
 # aliases

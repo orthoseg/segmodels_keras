@@ -3,9 +3,9 @@ from keras import layers
 from keras import models
 from keras import utils as keras_utils
 
+from ..backbones.backbones_factory import Backbones
 from ._common_blocks import Conv2dBn
 from ._utils import freeze_model
-from ..backbones.backbones_factory import Backbones
 
 
 # ---------------------------------------------------------------------
@@ -60,10 +60,10 @@ def DoubleConv3x3BnReLU(filters, use_batchnorm, name=None):
 
 
 def FPNBlock(pyramid_filters, stage):
-    conv0_name = "fpn_stage_p{}_pre_conv".format(stage)
-    conv1_name = "fpn_stage_p{}_conv".format(stage)
-    add_name = "fpn_stage_p{}_add".format(stage)
-    up_name = "fpn_stage_p{}_upsampling".format(stage)
+    conv0_name = f"fpn_stage_p{stage}_pre_conv"
+    conv1_name = f"fpn_stage_p{stage}_conv"
+    add_name = f"fpn_stage_p{stage}_add"
+    up_name = f"fpn_stage_p{stage}_upsampling"
 
     channels_axis = 3 if backend.image_data_format() == "channels_last" else 1
 
@@ -163,9 +163,7 @@ def build_fpn(
         )
     else:
         raise ValueError(
-            'Aggregation parameter should be in ("sum", "concat"), got {}'.format(
-                aggregation
-            )
+            f'Aggregation parameter should be in ("sum", "concat"), got {aggregation}'
         )
 
     if dropout:
@@ -217,23 +215,29 @@ def FPN(
     """FPN_ is a fully convolution neural network for image semantic segmentation
 
     Args:
-        backbone_name: name of classification model (without last dense layers) used as feature
-                extractor to build segmentation model.
-        input_shape: shape of input data/image ``(H, W, C)``, in general
-                case you do not need to set ``H`` and ``W`` shapes, just pass ``(None, None, C)`` to make your model be
-                able to process images af any size, but ``H`` and ``W`` of input images should be divisible by factor ``32``.
+        backbone_name: name of classification model (without last dense layers) used as
+            feature extractor to build segmentation model.
+        input_shape: shape of input data/image ``(H, W, C)``, in general case you do not
+            need to set ``H`` and ``W`` shapes, just pass ``(None, None, C)`` to make
+            your model be able to process images af any size, but ``H`` and ``W`` of
+            input images should be divisible by factor ``32``.
         classes: a number of classes for output (output shape - ``(h, w, classes)``).
         weights: optional, path to model weights.
-        activation: name of one of ``keras.activations`` for last model layer (e.g. ``sigmoid``, ``softmax``, ``linear``).
-        encoder_weights: one of ``None`` (random initialization), ``imagenet`` (pre-training on ImageNet).
-        encoder_freeze: if ``True`` set all layers of encoder (backbone model) as non-trainable.
-        encoder_features: a list of layer numbers or names starting from top of the model.
-                Each of these layers will be used to build features pyramid. If ``default`` is used
-                layer names are taken from ``DEFAULT_FEATURE_PYRAMID_LAYERS``.
+        activation: name of one of ``keras.activations`` for last model layer
+            (e.g. ``sigmoid``, ``softmax``, ``linear``).
+        encoder_weights: one of ``None`` (random initialization), ``imagenet``
+            (pre-training on ImageNet).
+        encoder_freeze: if ``True`` set all layers of encoder (backbone model) as
+            non-trainable.
+        encoder_features: a list of layer numbers or names starting from top of the
+            model. Each of these layers will be used to build features pyramid. If
+            ``default`` is used layer names are taken from
+            ``DEFAULT_FEATURE_PYRAMID_LAYERS``.
         pyramid_block_filters: a number of filters in Feature Pyramid Block of FPN_.
-        pyramid_use_batchnorm: if ``True``, ``BatchNormalisation`` layer between ``Conv2D`` and ``Activation`` layers
-                is used.
-        pyramid_aggregation: one of 'sum' or 'concat'. The way to aggregate pyramid blocks.
+        pyramid_use_batchnorm: if ``True``, ``BatchNormalisation`` layer between
+            ``Conv2D`` and ``Activation`` layers is used.
+        pyramid_aggregation: one of 'sum' or 'concat'. The way to aggregate pyramid
+            blocks.
         pyramid_dropout: spatial dropout rate for feature pyramid in range (0, 1).
 
     Returns:
