@@ -1,9 +1,8 @@
-from keras_applications import get_submodules_from_kwargs
+from keras import layers
 
 
-def freeze_model(model, **kwargs):
+def freeze_model(model, **kwargs):  # noqa: ARG001
     """Set all layers non trainable, excluding BatchNormalization layers"""
-    _, layers, _, _ = get_submodules_from_kwargs(kwargs)
     for layer in model.layers:
         if not isinstance(layer, layers.BatchNormalization):
             layer.trainable = False

@@ -15,7 +15,7 @@ import os
 
 from keras import backend, layers, models
 from keras import utils as keras_utils
-from keras_applications import imagenet_utils
+from keras.applications import imagenet_utils
 
 BASE_WEIGHT_URL = (
     "https://github.com/fchollet/deep-learning-models/releases/download/v0.7/"

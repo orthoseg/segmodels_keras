@@ -11,7 +11,7 @@ import os
 
 from keras import backend, layers, models
 from keras import utils as keras_utils
-from keras_applications import imagenet_utils
+from keras.applications import imagenet_utils
 
 WEIGHTS_PATH = (
     "https://github.com/fchollet/deep-learning-models/"
