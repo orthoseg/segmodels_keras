@@ -47,6 +47,38 @@ class BackbonesFactory:
                 "conv1_relu",
             ),
         ),
+        # ResNetV2
+        # Layers reused from: https://github.com/yingkaisha/keras-unet-collection
+        "resnet50v2": (
+            ka.ResNet50V2,
+            ka.resnet_v2.preprocess_input,
+            (
+                "conv4_block6_1_relu",
+                "conv3_block4_1_relu",
+                "conv2_block3_1_relu",
+                "conv1_conv",
+            ),
+        ),
+        "resnet101v2": (
+            ka.ResNet101V2,
+            ka.resnet_v2.preprocess_input,
+            (
+                "conv4_block23_1_relu",
+                "conv3_block4_1_relu",
+                "conv2_block3_1_relu",
+                "conv1_conv",
+            ),
+        ),
+        "resnet152v2": (
+            ka.ResNet152V2,
+            ka.resnet_v2.preprocess_input,
+            (
+                "conv4_block36_1_relu",
+                "conv3_block8_1_relu",
+                "conv2_block3_1_relu",
+                "conv1_conv",
+            ),
+        ),
         # VGG
         "vgg16": (
             ka.vgg16.VGG16,
@@ -197,6 +229,18 @@ class BackbonesFactory:
                 "block2a_expand_activation",
             ),
         ],
+        # EfficientNetV2
+        # Layers reused from: https://github.com/chinefed/segmentation_models_fork
+        "efficientnetv2m": (
+            ka.EfficientNetV2M,
+            ka.efficientnet_v2.preprocess_input,
+            (
+                "block6a_expand_conv",
+                "block4a_expand_conv",
+                "block2e_add",
+                "block1c_add",
+            ),
+        ),
     }
 
     @property
