@@ -170,7 +170,7 @@ def InceptionResNetV2(
     input_shape=None,
     pooling=None,
     classes=1000,
-    **kwargs,
+    **kwargs,  # noqa: ARG001
 ):
     """Instantiates the Inception-ResNet v2 architecture.
     Optionally loads weights pre-trained on ImageNet.

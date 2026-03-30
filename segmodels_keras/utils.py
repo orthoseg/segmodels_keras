@@ -1,8 +1,6 @@
 """Utility functions for segmentation models"""
 
-from keras_applications import get_submodules_from_kwargs
-
-from . import inject_global_submodules
+from keras import models
 
 
 def set_trainable(model, recompile=True, **kwargs):  # noqa: ARG001
@@ -38,7 +36,6 @@ def set_trainable(model, recompile=True, **kwargs):  # noqa: ARG001
         )
 
 
-@inject_global_submodules
 def set_regularization(
     model,
     kernel_regularizer=None,
@@ -46,7 +43,7 @@ def set_regularization(
     activity_regularizer=None,
     beta_regularizer=None,
     gamma_regularizer=None,
-    **kwargs,
+    **kwargs,  # noqa: ARG001
 ):
     """Set regularizers to all layers
 
@@ -64,8 +61,6 @@ def set_regularization(
     Return:
         out (``Model``): config updated model
     """
-    _, _, models, _ = get_submodules_from_kwargs(kwargs)
-
     for layer in model.layers:
         # set kernel_regularizer
         if kernel_regularizer is not None and hasattr(layer, "kernel_regularizer"):

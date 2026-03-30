@@ -248,7 +248,7 @@ def Linknet(
     .. _Linknet:
         https://arxiv.org/pdf/1707.03718.pdf
     """
-    if decoder_block_type == 'upsampling':
+    if decoder_block_type == "upsampling":
         decoder_block = DecoderUpsamplingX2Block
     elif decoder_block_type == "transpose":
         decoder_block = DecoderTransposeX2Block

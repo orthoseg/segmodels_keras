@@ -15,7 +15,7 @@ else:
 X1 = np.ones((1, 32, 32, 3))
 Y1 = np.ones((1, 32, 32, 1))
 MODEL = Unet
-BACKBONE = "resnet18"
+BACKBONE = "resnet50"
 CASE = ((X1, Y1, MODEL, BACKBONE),)
 
 

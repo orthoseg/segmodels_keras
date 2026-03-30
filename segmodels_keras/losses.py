@@ -61,10 +61,7 @@ class DiceLoss(Loss):
 
     The formula in terms of *Type I* and *Type II* errors:
 
-    .. math::
-
-        L(tp, fp, fn) = \frac{(1 + \beta^2) \cdot tp}
-            {(1 + \beta^2) \cdot fp + \beta^2 \cdot fn + fp}
+    .. math:: L(tp, fp, fn) = \frac{(1 + \beta^2) \cdot tp} {(1 + \beta^2) \cdot fp + \beta^2 \cdot fn + fp}
 
     where:
          - tp - true positives;
@@ -91,7 +88,7 @@ class DiceLoss(Loss):
 
         loss = DiceLoss()
         model.compile('SGD', loss=loss)
-    """
+    """  # noqa: E501
 
     def __init__(
         self,
@@ -233,10 +230,7 @@ class BinaryFocalLoss(Loss):
     r"""Creates a criterion that measures the Binary Focal Loss between the
     ground truth (gt) and the prediction (pr).
 
-    .. math::
-
-        L(gt, pr) = - gt \alpha (1 - pr)^\gamma \log(pr)
-            - (1 - gt) \alpha pr^\gamma \log(1 - pr)
+    .. math:: L(gt, pr) = - gt \alpha (1 - pr)^\gamma \log(pr) - (1 - gt) \alpha pr^\gamma \log(1 - pr)
 
     Args:
         alpha: Float or integer, the same as weighting factor in balanced cross entropy,
@@ -254,7 +248,7 @@ class BinaryFocalLoss(Loss):
 
         loss = BinaryFocalLoss()
         model.compile('SGD', loss=loss)
-    """
+    """  # noqa: E501
 
     def __init__(self, alpha=0.25, gamma=2.0):
         super().__init__(name="binary_focal_loss")

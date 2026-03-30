@@ -1,10 +1,11 @@
-name: segmentation-models-old-dev
+name: segmodels-keras2-dev
 channels:
   - conda-forge
 dependencies:
   - python =3.10
   - pip
   - keras-applications>=1.0.7,<=1.0.8
+  - keras =2.10
   - numpy <2
   # Linting, tests,...
   - pre-commit

@@ -15,6 +15,10 @@ else:
     raise ValueError(f"Incorrect framework {sm.framework()}")
 
 
+def str2bool(v):
+    return v.lower() in ("yes", "true", "t", "1")
+
+
 def get_backbones():
     is_travis = str2bool(os.environ.get("TRAVIS", "False"))
     exclude = ["efficientnetb6", "efficientnetb7"]
@@ -34,10 +38,6 @@ def _select_names(names):
         return ["resnet50", "inceptionresnetv2", "efficientnetb0"]
     else:
         return names
-
-
-def str2bool(v):
-    return v.lower() in ("yes", "true", "t", "1")
 
 
 def keras_test(func):

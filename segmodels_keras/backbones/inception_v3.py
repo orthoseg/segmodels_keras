@@ -7,15 +7,9 @@ and that the input preprocessing function is also different (same as Xception).
     http://arxiv.org/abs/1512.00567) (CVPR 2016)
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import os
 
-from keras import backend
-from keras import layers
-from keras import models
+from keras import backend, layers, models
 from keras import utils as keras_utils
 from keras_applications import imagenet_utils
 
@@ -76,7 +70,7 @@ def InceptionV3(
     input_shape=None,
     pooling=None,
     classes=1000,
-    **kwargs,
+    **kwargs,  # noqa: ARG001
 ):
     """Instantiates the Inception v3 architecture.
     Optionally loads weights pre-trained on ImageNet.

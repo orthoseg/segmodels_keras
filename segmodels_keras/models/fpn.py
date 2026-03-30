@@ -1,12 +1,9 @@
-from keras import backend
-from keras import layers
-from keras import models
+from keras import backend, layers, models
 from keras import utils as keras_utils
 
 from ..backbones.backbones_factory import Backbones
 from ._common_blocks import Conv2dBn
 from ._utils import freeze_model
-
 
 # ---------------------------------------------------------------------
 #  Utility functions
