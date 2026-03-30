@@ -70,10 +70,8 @@ def DecoderUpsamplingX2Block(filters, stage, use_batchnorm):
     channels_axis = 3 if backend.image_data_format() == "channels_last" else 1
 
     def wrapper(input_tensor, skip=None):
-        input_filters = backend.int_shape(input_tensor)[channels_axis]
-        output_filters = (
-            backend.int_shape(skip)[channels_axis] if skip is not None else filters
-        )
+        input_filters = input_tensor.shape[channels_axis]
+        output_filters = skip.shape[channels_axis] if skip is not None else filters
 
         x = Conv1x1BnReLU(input_filters // 4, use_batchnorm, name=conv_block1_name)(
             input_tensor
@@ -100,10 +98,8 @@ def DecoderTransposeX2Block(filters, stage, use_batchnorm):
     channels_axis = bn_axis = 3 if backend.image_data_format() == "channels_last" else 1
 
     def wrapper(input_tensor, skip=None):
-        input_filters = backend.int_shape(input_tensor)[channels_axis]
-        output_filters = (
-            backend.int_shape(skip)[channels_axis] if skip is not None else filters
-        )
+        input_filters = input_tensor.shape[channels_axis]
+        output_filters = skip.shape[channels_axis] if skip is not None else filters
 
         x = Conv1x1BnReLU(input_filters // 4, use_batchnorm, name=conv_block1_name)(
             input_tensor

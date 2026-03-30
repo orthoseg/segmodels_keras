@@ -1,207 +1,225 @@
-import copy
-
-import efficientnet.model as eff
-from classification_models.models_factory import ModelsFactory
+import keras.applications as ka
 
 from . import inception_resnet_v2 as irv2
 from . import inception_v3 as iv3
 
 
-class BackbonesFactory(ModelsFactory):
-    _default_feature_layers = {
-        # List of layers to take features from backbone in the following order:
-        # (x16, x8, x4, x2, x1) - `x4` mean that features has 4 times less spatial
-        # resolution (Height x Width) than input image.
-        # VGG
-        "vgg16": (
-            "block5_conv3",
-            "block4_conv3",
-            "block3_conv3",
-            "block2_conv2",
-            "block1_conv2",
-        ),
-        "vgg19": (
-            "block5_conv4",
-            "block4_conv4",
-            "block3_conv4",
-            "block2_conv2",
-            "block1_conv2",
-        ),
+class BackbonesFactory:
+    """Dict with all supported backbones.
+
+    Each backbone is represented as a tuple of 3 elements:
+    1. Backbone class
+    2. Preprocessing function
+    3. List of layers to take features from backbone in the following order:
+       (x16, x8, x4, x2, x1) - `x4` mean that features has 4 times less spatial
+       resolution (Height x Width) than input image.
+    """
+
+    _models = {  # noqa: RUF012
         # ResNets
-        "resnet18": (
-            "stage4_unit1_relu1",
-            "stage3_unit1_relu1",
-            "stage2_unit1_relu1",
-            "relu0",
-        ),
-        "resnet34": (
-            "stage4_unit1_relu1",
-            "stage3_unit1_relu1",
-            "stage2_unit1_relu1",
-            "relu0",
-        ),
         "resnet50": (
-            "stage4_unit1_relu1",
-            "stage3_unit1_relu1",
-            "stage2_unit1_relu1",
-            "relu0",
+            ka.ResNet50,
+            ka.resnet.preprocess_input,
+            (
+                "conv4_block6_out",
+                "conv3_block4_out",
+                "conv2_block3_out",
+                "conv1_relu",
+            ),
         ),
         "resnet101": (
-            "stage4_unit1_relu1",
-            "stage3_unit1_relu1",
-            "stage2_unit1_relu1",
-            "relu0",
+            ka.ResNet101,
+            ka.resnet.preprocess_input,
+            (
+                "conv4_block23_out",
+                "conv3_block4_out",
+                "conv2_block3_out",
+                "conv1_relu",
+            ),
         ),
         "resnet152": (
-            "stage4_unit1_relu1",
-            "stage3_unit1_relu1",
-            "stage2_unit1_relu1",
-            "relu0",
+            ka.ResNet152,
+            ka.resnet.preprocess_input,
+            (
+                "conv4_block36_out",
+                "conv3_block8_out",
+                "conv2_block3_out",
+                "conv1_relu",
+            ),
         ),
-        # ResNeXt
-        "resnext50": (
-            "stage4_unit1_relu1",
-            "stage3_unit1_relu1",
-            "stage2_unit1_relu1",
-            "relu0",
+        # VGG
+        "vgg16": (
+            ka.vgg16.VGG16,
+            ka.vgg16.preprocess_input,
+            (
+                "block5_conv3",
+                "block4_conv3",
+                "block3_conv3",
+                "block2_conv2",
+                "block1_conv2",
+            ),
         ),
-        "resnext101": (
-            "stage4_unit1_relu1",
-            "stage3_unit1_relu1",
-            "stage2_unit1_relu1",
-            "relu0",
+        "vgg19": (
+            ka.vgg19.VGG19,
+            ka.vgg19.preprocess_input,
+            (
+                "block5_conv4",
+                "block4_conv4",
+                "block3_conv4",
+                "block2_conv2",
+                "block1_conv2",
+            ),
+        ),
+        # DenseNet
+        "densenet121": (
+            ka.densenet.DenseNet121,
+            ka.densenet.preprocess_input,
+            # (311, 139, 51, 4),
+            ("pool4_conv", "pool3_conv", "pool2_conv", "conv1/relu"),
+        ),
+        "densenet169": (
+            ka.densenet.DenseNet169,
+            ka.densenet.preprocess_input,
+            # (367, 139, 51, 4),
+            ("pool4_conv", "pool3_conv", "pool2_conv", "conv1/relu"),
+        ),
+        "densenet201": (
+            ka.densenet.DenseNet201,
+            ka.densenet.preprocess_input,
+            # (479, 139, 51, 4),
+            ("pool4_conv", "pool3_conv", "pool2_conv", "conv1/relu"),
         ),
         # Inception
-        "inceptionv3": (228, 86, 16, 9),
-        "inceptionresnetv2": (594, 260, 16, 9),
-        # DenseNet
-        "densenet121": (311, 139, 51, 4),
-        "densenet169": (367, 139, 51, 4),
-        "densenet201": (479, 139, 51, 4),
-        # SE models
-        "seresnet18": (
-            "stage4_unit1_relu1",
-            "stage3_unit1_relu1",
-            "stage2_unit1_relu1",
-            "relu0",
+        "inceptionresnetv2": (
+            irv2.InceptionResNetV2,
+            irv2.preprocess_input,
+            (594, 260, 16, 9),
         ),
-        "seresnet34": (
-            "stage4_unit1_relu1",
-            "stage3_unit1_relu1",
-            "stage2_unit1_relu1",
-            "relu0",
-        ),
-        "seresnet50": (246, 136, 62, 4),
-        "seresnet101": (552, 136, 62, 4),
-        "seresnet152": (858, 208, 62, 4),
-        "seresnext50": (1078, 584, 254, 4),
-        "seresnext101": (2472, 584, 254, 4),
-        "senet154": (6884, 1625, 454, 12),
-        # Mobile Nets
+        "inceptionv3": (iv3.InceptionV3, iv3.preprocess_input, (228, 86, 16, 9)),
+        # MobileNet
         "mobilenet": (
-            "conv_pw_11_relu",
-            "conv_pw_5_relu",
-            "conv_pw_3_relu",
-            "conv_pw_1_relu",
+            ka.mobilenet.MobileNet,
+            ka.mobilenet.preprocess_input,
+            (
+                "conv_pw_11_relu",
+                "conv_pw_5_relu",
+                "conv_pw_3_relu",
+                "conv_pw_1_relu",
+            ),
         ),
         "mobilenetv2": (
-            "block_13_expand_relu",
-            "block_6_expand_relu",
-            "block_3_expand_relu",
-            "block_1_expand_relu",
+            ka.mobilenet_v2.MobileNetV2,
+            ka.mobilenet_v2.preprocess_input,
+            (
+                "block_13_expand_relu",
+                "block_6_expand_relu",
+                "block_3_expand_relu",
+                "block_1_expand_relu",
+            ),
         ),
-        # EfficientNets
-        "efficientnetb0": (
-            "block6a_expand_activation",
-            "block4a_expand_activation",
-            "block3a_expand_activation",
-            "block2a_expand_activation",
-        ),
-        "efficientnetb1": (
-            "block6a_expand_activation",
-            "block4a_expand_activation",
-            "block3a_expand_activation",
-            "block2a_expand_activation",
-        ),
-        "efficientnetb2": (
-            "block6a_expand_activation",
-            "block4a_expand_activation",
-            "block3a_expand_activation",
-            "block2a_expand_activation",
-        ),
-        "efficientnetb3": (
-            "block6a_expand_activation",
-            "block4a_expand_activation",
-            "block3a_expand_activation",
-            "block2a_expand_activation",
-        ),
-        "efficientnetb4": (
-            "block6a_expand_activation",
-            "block4a_expand_activation",
-            "block3a_expand_activation",
-            "block2a_expand_activation",
-        ),
-        "efficientnetb5": (
-            "block6a_expand_activation",
-            "block4a_expand_activation",
-            "block3a_expand_activation",
-            "block2a_expand_activation",
-        ),
-        "efficientnetb6": (
-            "block6a_expand_activation",
-            "block4a_expand_activation",
-            "block3a_expand_activation",
-            "block2a_expand_activation",
-        ),
-        "efficientnetb7": (
-            "block6a_expand_activation",
-            "block4a_expand_activation",
-            "block3a_expand_activation",
-            "block2a_expand_activation",
-        ),
+        "efficientnetb0": [
+            ka.EfficientNetB0,
+            ka.efficientnet.preprocess_input,
+            (
+                "block6a_expand_activation",
+                "block4a_expand_activation",
+                "block3a_expand_activation",
+                "block2a_expand_activation",
+            ),
+        ],
+        "efficientnetb1": [
+            ka.EfficientNetB1,
+            ka.efficientnet.preprocess_input,
+            (
+                "block6a_expand_activation",
+                "block4a_expand_activation",
+                "block3a_expand_activation",
+                "block2a_expand_activation",
+            ),
+        ],
+        "efficientnetb2": [
+            ka.EfficientNetB2,
+            ka.efficientnet.preprocess_input,
+            (
+                "block6a_expand_activation",
+                "block4a_expand_activation",
+                "block3a_expand_activation",
+                "block2a_expand_activation",
+            ),
+        ],
+        "efficientnetb3": [
+            ka.EfficientNetB3,
+            ka.efficientnet.preprocess_input,
+            (
+                "block6a_expand_activation",
+                "block4a_expand_activation",
+                "block3a_expand_activation",
+                "block2a_expand_activation",
+            ),
+        ],
+        "efficientnetb4": [
+            ka.EfficientNetB4,
+            ka.efficientnet.preprocess_input,
+            (
+                "block6a_expand_activation",
+                "block4a_expand_activation",
+                "block3a_expand_activation",
+                "block2a_expand_activation",
+            ),
+        ],
+        "efficientnetb5": [
+            ka.EfficientNetB5,
+            ka.efficientnet.preprocess_input,
+            (
+                "block6a_expand_activation",
+                "block4a_expand_activation",
+                "block3a_expand_activation",
+                "block2a_expand_activation",
+            ),
+        ],
+        "efficientnetb6": [
+            ka.EfficientNetB6,
+            ka.efficientnet.preprocess_input,
+            (
+                "block6a_expand_activation",
+                "block4a_expand_activation",
+                "block3a_expand_activation",
+                "block2a_expand_activation",
+            ),
+        ],
+        "efficientnetb7": [
+            ka.EfficientNetB7,
+            ka.efficientnet.preprocess_input,
+            (
+                "block6a_expand_activation",
+                "block4a_expand_activation",
+                "block3a_expand_activation",
+                "block2a_expand_activation",
+            ),
+        ],
     }
-
-    _models_update = {
-        "inceptionresnetv2": [irv2.InceptionResNetV2, irv2.preprocess_input],
-        "inceptionv3": [iv3.InceptionV3, iv3.preprocess_input],
-        "efficientnetb0": [eff.EfficientNetB0, eff.preprocess_input],
-        "efficientnetb1": [eff.EfficientNetB1, eff.preprocess_input],
-        "efficientnetb2": [eff.EfficientNetB2, eff.preprocess_input],
-        "efficientnetb3": [eff.EfficientNetB3, eff.preprocess_input],
-        "efficientnetb4": [eff.EfficientNetB4, eff.preprocess_input],
-        "efficientnetb5": [eff.EfficientNetB5, eff.preprocess_input],
-        "efficientnetb6": [eff.EfficientNetB6, eff.preprocess_input],
-        "efficientnetb7": [eff.EfficientNetB7, eff.preprocess_input],
-    }
-
-    # currently not supported
-    _models_delete = [
-        "resnet50v2",
-        "resnet101v2",
-        "resnet152v2",
-        "nasnetlarge",
-        "nasnetmobile",
-        "xception",
-    ]
 
     @property
     def models(self):
-        all_models = copy.copy(self._models)
-        all_models.update(self._models_update)
-        for k in self._models_delete:
-            del all_models[k]
-        return all_models
+        return self._models
+
+    def models_names(self):
+        return list(self.models.keys())
 
     def get_backbone(self, name, *args, **kwargs):
-        model_fn, _ = self.get(name)
+        backbone = self._models.get(name)
+        if backbone is None:
+            raise ValueError(f"Backbone with name '{name}' is not supported.")
+
+        model_fn, _, _ = backbone
         model = model_fn(*args, **kwargs)
         return model
 
     def get_feature_layers(self, name, n=5):
-        return self._default_feature_layers[name][:n]
+        return self._models.get(name)[2][:n]
 
     def get_preprocessing(self, name):
-        return self.get(name)[1]
+        return self._models.get(name)[1]
 
 
 Backbones = BackbonesFactory()

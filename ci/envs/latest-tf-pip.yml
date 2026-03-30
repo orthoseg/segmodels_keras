@@ -4,7 +4,6 @@ channels:
 dependencies:
   - python
   - pip
-  - keras-applications>=1.0.7,<=1.0.8
   - keras
   # Linting, tests,...
   - pytest

@@ -1,4 +1,4 @@
-from keras_applications import get_submodules_from_kwargs
+from keras import backend, layers
 
 
 def Conv2dBn(
@@ -23,7 +23,6 @@ def Conv2dBn(
 
     conv_name, act_name, bn_name = None, None, None
     block_name = kwargs.pop("name", None)
-    backend, layers, _models, _keras_utils = get_submodules_from_kwargs(kwargs)
 
     if block_name is not None:
         conv_name = block_name + "_conv"

@@ -1,15 +1,13 @@
-name: segmodels-keras2-dev
+name: segmodels-dev
 channels:
   - conda-forge
 dependencies:
-  - python =3.10
+  - python =3.12
   - pip
-  - keras =2.10
+  - keras
+  - tensorflow
   # Dependencies needed for linting, tests,...
-  - numpy <2
+  - numpy
   - pre-commit
   - pytest
   - ruff =0.15.8
-  - pip:
-    - tensorflow==2.10.0
-    - numpy <2

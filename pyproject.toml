@@ -51,6 +51,7 @@ ignore = [
     "PLR0912",  # Too many branches
     "PLR0915",  # Too many statements
     "PLR2004",  # Magic number
+    "PLR5501",  # Use `elif` instead of `else` then `if`, to reduce indentation
     "PLW2901",  # Loop variable overwritten by assignment target
 ]
 

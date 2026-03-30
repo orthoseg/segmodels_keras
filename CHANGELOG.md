@@ -1,9 +1,17 @@
 # Change Log
 
-**Version 1.1.0**
+**Version 2.0.0**
 
 ###### Deprecation info
- - 
+ - Support of keras 1 was dropped.
+ - Support for following backbones was dropped:
+     - resnet18, resnet34
+     - seresnet18, seresnet34, seresnet101, seresnet152
+     - seresnext50, seresnext101, senet154
+
+###### Areas of improvement
+ - Use/support more recent versions of keras (#5)
+ - General code improvements by using ruff (#4)
 
 **Version 1.0.0**
 
