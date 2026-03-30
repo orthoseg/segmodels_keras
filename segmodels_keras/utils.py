@@ -1,10 +1,11 @@
-""" Utility functions for segmentation models """
+"""Utility functions for segmentation models"""
 
 from keras_applications import get_submodules_from_kwargs
+
 from . import inject_global_submodules
 
 
-def set_trainable(model, recompile=True, **kwargs):
+def set_trainable(model, recompile=True, **kwargs):  # noqa: ARG001
     """Set all layers of model trainable and recompile it
 
     Note:
@@ -39,13 +40,13 @@ def set_trainable(model, recompile=True, **kwargs):
 
 @inject_global_submodules
 def set_regularization(
-        model,
-        kernel_regularizer=None,
-        bias_regularizer=None,
-        activity_regularizer=None,
-        beta_regularizer=None,
-        gamma_regularizer=None,
-        **kwargs
+    model,
+    kernel_regularizer=None,
+    bias_regularizer=None,
+    activity_regularizer=None,
+    beta_regularizer=None,
+    gamma_regularizer=None,
+    **kwargs,
 ):
     """Set regularizers to all layers
 
@@ -67,20 +68,20 @@ def set_regularization(
 
     for layer in model.layers:
         # set kernel_regularizer
-        if kernel_regularizer is not None and hasattr(layer, 'kernel_regularizer'):
+        if kernel_regularizer is not None and hasattr(layer, "kernel_regularizer"):
             layer.kernel_regularizer = kernel_regularizer
         # set bias_regularizer
-        if bias_regularizer is not None and hasattr(layer, 'bias_regularizer'):
+        if bias_regularizer is not None and hasattr(layer, "bias_regularizer"):
             layer.bias_regularizer = bias_regularizer
         # set activity_regularizer
-        if activity_regularizer is not None and hasattr(layer, 'activity_regularizer'):
+        if activity_regularizer is not None and hasattr(layer, "activity_regularizer"):
             layer.activity_regularizer = activity_regularizer
 
         # set beta and gamma of BN layer
-        if beta_regularizer is not None and hasattr(layer, 'beta_regularizer'):
+        if beta_regularizer is not None and hasattr(layer, "beta_regularizer"):
             layer.beta_regularizer = beta_regularizer
 
-        if gamma_regularizer is not None and hasattr(layer, 'gamma_regularizer'):
+        if gamma_regularizer is not None and hasattr(layer, "gamma_regularizer"):
             layer.gamma_regularizer = gamma_regularizer
 
     out = models.model_from_json(model.to_json())
