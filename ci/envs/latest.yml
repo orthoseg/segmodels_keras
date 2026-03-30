@@ -1,0 +1,13 @@
+name: tests-latest
+channels:
+  - conda-forge
+dependencies:
+  - python
+  - pip
+  - keras-applications>=1.0.7,<=1.0.8
+  - keras
+  - tensorflow
+  # Dependencies needed to run tests,...
+  - numpy
+  - pytest
+  - pytest-cov

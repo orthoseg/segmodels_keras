@@ -1,0 +1,86 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: Tests
+
+on:
+  push:
+    branches: [ master, v2.** ]
+  pull_request:
+    branches: [ master, v2.** ]
+    paths-ignore:
+      - "docs/**"
+      - "examples/**"
+      - "*.md"
+      - "*.yml"
+  schedule:
+    # every Wednesday at 3:40 AM
+    - cron: "40 3 * * 3"
+
+concurrency: 
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  Test:
+    name: ${{ matrix.env }}, python ${{ matrix.python }}, ${{ matrix.os }}
+    timeout-minutes: 30
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash -l {0}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        dev: [false]
+        python: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+        env: ["latest"]
+        # Use openblas instead of mkl saves 600 MB. Linux OK, 50% slower on Windows and OSX!
+        extra: ["nomkl"]
+        include:
+          - env: minimal-tf-pip
+            os: ubuntu-latest
+            dev: false
+            python: "3.10"
+          - env: minimal-tf-pip
+            os: windows-latest
+            dev: false
+            python: "3.10"
+          - env: latest-tf-pip
+            os: macos-latest
+            dev: false
+            python: "3.12"
+          - env: latest-tf-pip
+            os: windows-latest
+            dev: false
+            python: "3.12"
+
+    steps:
+      - uses: actions/checkout@v6
+
+      # - name: Set environment variables
+      #   run: echo "PYTHONTRACEMALLOC=1" >> $GITHUB_ENV
+
+      - name: Install Conda environment with Micromamba
+        uses: mamba-org/setup-micromamba@v2
+        with:
+          # Any version from https://github.com/mamba-org/micromamba-releases
+          micromamba-version: "2.5.0-1"
+          environment-file: ci/envs/${{ matrix.env }}.yml
+          create-args: >-
+            python=${{ matrix.python }}
+            ${{ matrix.extra }}
+
+      - name: Print versions
+        run: >-
+          python -c "import sys; print('Python version:', sys.version)"
+
+      - name: Test
+        run: >-
+          pytest
+          --color=yes
+          --cov=segmodels_keras --cov-append --cov-report term-missing --cov-report 
+          xml tests/
+
+      - uses: codecov/codecov-action@v5

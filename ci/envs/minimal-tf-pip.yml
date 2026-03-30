@@ -1,15 +1,15 @@
-name: segmodels-keras2-dev
+name: tests-minimal-tf-pip
 channels:
   - conda-forge
 dependencies:
-  - python =3.10
+  - python
   - pip
   - keras-applications>=1.0.7,<=1.0.8
   - keras =2.10
   - numpy <2
   # Linting, tests,...
-  - pre-commit
   - pytest
-  - ruff =0.15.8
+  - pytest-cov
   - pip:
     - tensorflow==2.10.0
+    - numpy <2
