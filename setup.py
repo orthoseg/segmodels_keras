@@ -4,17 +4,15 @@
 #   $ pip install twine
 
 import os
-import sys
-from shutil import rmtree
 
-from setuptools import Command, find_packages, setup
+from setuptools import find_packages, setup
 
 # Package meta-data.
-NAME = "segmentation_models"
+NAME = "segmodels_keras"
 DESCRIPTION = "Image segmentation models with pre-trained backbones with Keras."
-URL = "https://github.com/qubvel/segmentation_models"
-EMAIL = "qubvel@gmail.com"
-AUTHOR = "Pavel Yakubovskiy"
+URL = "https://github.com/theroggy/segmodels_keras"
+EMAIL = "pieter.roggemans@gmail.com"
+AUTHOR = "Pieter Roggemans"
 REQUIRES_PYTHON = ">=3.0.0"
 VERSION = None
 
@@ -26,15 +24,11 @@ VERSION = None
 here = os.path.abspath(os.path.dirname(__file__))
 
 # What packages are required for this module to be executed?
-try:
-    with open(os.path.join(here, "requirements.txt"), encoding="utf-8") as f:
-        REQUIRED = f.read().split("\n")
-except:  # noqa: E722
-    REQUIRED = []
+REQUIRED = ["keras"]
 
 # What packages are optional?
 EXTRAS = {
-    "tests": ["pytest", "scikit-image"],
+    "tests": ["numpy", "pytest", "scikit-image"],
 }
 
 # Import the README and use it as the long-description.
@@ -54,50 +48,13 @@ else:
     about["__version__"] = VERSION
 
 
-class UploadCommand(Command):
-    """Support setup.py upload."""
-
-    description = "Build and publish the package."
-    user_options = []  # noqa: RUF012
-
-    @staticmethod
-    def status(s):
-        """Prints things in bold."""
-        print(s)
-
-    def initialize_options(self):
-        pass
-
-    def finalize_options(self):
-        pass
-
-    def run(self):
-        try:
-            self.status("Removing previous builds...")
-            rmtree(os.path.join(here, "dist"))
-        except OSError:
-            pass
-
-        self.status("Building Source and Wheel (universal) distribution...")
-        os.system(f"{sys.executable} setup.py sdist bdist_wheel --universal")
-
-        self.status("Uploading the package to PyPI via Twine...")
-        os.system("twine upload dist/*")
-
-        self.status("Pushing git tags...")
-        os.system(f"git tag v{about['__version__']}")
-        os.system("git push --tags")
-
-        sys.exit()
-
-
 # Where the magic happens:
 setup(
     name=NAME,
     version=about["__version__"],
     description=DESCRIPTION,
     long_description=long_description,
-    long_description_content_type="text/x-rst",
+    long_description_content_type="text/markdown",
     author=AUTHOR,
     author_email=EMAIL,
     python_requires=REQUIRES_PYTHON,
@@ -121,8 +78,4 @@ setup(
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
     ],
-    # $ setup.py publish support.
-    cmdclass={
-        "upload": UploadCommand,
-    },
 )
