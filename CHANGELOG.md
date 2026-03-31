@@ -5,7 +5,8 @@
 **Version 0.1.0**
 
 ###### Deprecation info
- - Package renamed to `segmodels_keras` to make a clean break (#1, #3)
+ - Package renamed to `segmodels_keras` to make it clear it isn't the same library
+   (#1, #3)
  - Support of keras v1 was dropped.
  - Support for following backbones was dropped:
      - resnet18, resnet34
