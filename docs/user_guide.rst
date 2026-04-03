@@ -1,60 +1,44 @@
-Tutorial
-========
-
-**Segmentation models** is python library with Neural Networks for
-`Image
-Segmentation <https://en.wikipedia.org/wiki/Image_segmentation>`__ based
-on `Keras <https://keras.io>`__
-(`Tensorflow <https://www.tensorflow.org/>`__) framework.
-
-**The main features** of this library are:
-
--  High level API (just two lines to create NN)
--  **4** models architectures for binary and multi class segmentation
-   (including legendary **Unet**)
--  **25** available backbones for each architecture
--  All backbones have **pre-trained** weights for faster and better
-   convergence
-
 Quick start
 ~~~~~~~~~~~
-Since the library is built on the Keras framework, created segmentation model is just a Keras Model, which can be created as easy as:
+Since the library is built on the Keras framework, created segmentation model is just a
+Keras Model, which can be created as easy as:
 
 .. code:: python
 
-    from segmentation_models import Unet
+    from segmodels_keras import Unet
 
     model = Unet()
 
-Depending on the task, you can change the network architecture by choosing backbones with fewer or more parameters and use pretrainded weights to initialize it:
+Depending on the task, you can change the network architecture by choosing backbones
+with fewer or more parameters and use pretrainded weights to initialize it:
 
 .. code:: python
 
-    model = Unet('resnet34', encoder_weights='imagenet')
+    model = Unet('resnet50', encoder_weights='imagenet')
 
 Change number of output classes in the model:
 
 .. code:: python
 
-    model = Unet('resnet34', classes=3, activation='softmax')
+    model = Unet('resnet50', classes=3, activation='softmax')
 
 Change input shape of the model:
 
 .. code:: python
 
-    model = Unet('resnet34', input_shape=(None, None, 6), encoder_weights=None)
+    model = Unet('resnet50', input_shape=(None, None, 6), encoder_weights=None)
 
 Simple training pipeline
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: python
 
-   from segmentation_models import Unet
-   from segmentation_models import get_preprocessing
-   from segmentation_models.losses import bce_jaccard_loss
-   from segmentation_models.metrics import iou_score
+   from segmodels_keras import Unet
+   from segmodels_keras import get_preprocessing
+   from segmodels_keras.losses import bce_jaccard_loss
+   from segmodels_keras.metrics import iou_score
 
-   BACKBONE = 'resnet34'
+   BACKBONE = 'resnet50'
    preprocess_input = get_preprocessing(BACKBONE)
 
    # load your data
@@ -77,9 +61,6 @@ Simple training pipeline
        validation_data=(x_val, y_val),
    )
 
-
-Same manimulations can be done with ``Linknet``, ``PSPNet`` and ``FPN``. For more detailed information about models API and  use cases `Read the Docs <https://segmentation-models.readthedocs.io/en/latest/>`__.
-
 Models and Backbones
 ~~~~~~~~~~~~~~~~~~~~
 **Models**
@@ -100,7 +81,7 @@ PSPNet        FPN
 |psp_image|   |fpn_image|
 ============= ==============
 
-.. _Unet: https://github.com/qubvel/segmentation_models/blob/readme/LICENSE
+.. _Unet: https://github.com/orthoseg/segmodels_keras/blob/main/LICENSE
 .. _Linknet: https://arxiv.org/abs/1707.03718
 .. _PSPNet: https://arxiv.org/abs/1612.01105
 .. _FPN: http://presentations.cocodataset.org/COCO17-Stuff-FAIR.pdf
@@ -114,23 +95,23 @@ PSPNet        FPN
 
 .. table::
 
-    ===========  =====
-    Type         Names
-    ===========  =====
-    VGG          ``'vgg16' 'vgg19'``
-    ResNet       ``'resnet18' 'resnet34' 'resnet50' 'resnet101' 'resnet152'``
-    SE-ResNet    ``'seresnet18' 'seresnet34' 'seresnet50' 'seresnet101' 'seresnet152'``
-    ResNeXt      ``'resnext50' 'resnet101'``
-    SE-ResNeXt   ``'seresnext50' 'seresnet101'``
-    SENet154     ``'senet154'``
-    DenseNet     ``'densenet121' 'densenet169' 'densenet201'``
-    Inception    ``'inceptionv3' 'inceptionresnetv2'``
-    MobileNet    ``'mobilenet' 'mobilenetv2'``
-    EfficientNet ``efficientnetb0`` ``efficientnetb1`` ``efficientnetb2`` ``efficientnetb3`` ``efficientnetb4`` ``efficientnetb5``
-    ===========  =====
+    =============  ===== 
+    Type           Names
+    =============  =====
+    VGG            ``'vgg16' 'vgg19'``
+    ResNet         ``'resnet50' 'resnet101' 'resnet152'``
+    ResNetV2       ``'resnet50v2' 'resnet101v2' 'resnet152v2'``
+    DenseNet       ``'densenet121' 'densenet169' 'densenet201'`` 
+    Inception      ``'inceptionv3' 'inceptionresnetv2'``
+    MobileNet      ``'mobilenet' 'mobilenetv2'``
+    EfficientNet   ``'efficientnetb0' 'efficientnetb1' 'efficientnetb2' 'efficientnetb3' 'efficientnetb4' 'efficientnetb5' 'efficientnetb6' 'efficientnetb7'``
+    EfficientNetV2 ``'efficientnetv2m'``    
+    =============  =====
+
 
 .. epigraph::
-    All backbones have weights trained on 2012 ILSVRC ImageNet dataset (``encoder_weights='imagenet'``).
+    All backbones have weights trained on 2012 ILSVRC ImageNet dataset
+    (``encoder_weights='imagenet'``).
 
 
 Fine tuning
@@ -144,10 +125,10 @@ while initializing the model.
 
 .. code-block:: python
 
-    from segmentation_models import Unet
-    from segmentation_models.utils import set_trainable
+    from segmodels_keras import Unet
+    from segmodels_keras.utils import set_trainable
 
-    model = Unet(backbone_name='resnet34', encoder_weights='imagenet', encoder_freeze=True)
+    model = Unet(backbone_name='resnet50', encoder_weights='imagenet', encoder_freeze=True)
     model.compile('Adam', 'binary_crossentropy', ['binary_accuracy'])
 
     # pretrain model decoder
@@ -170,7 +151,7 @@ you have few different options:
 
 .. code-block:: python
 
-    from segmentation_models import Unet
+    from segmodels_keras import Unet
 
     # read/scale/preprocess data
     x, y = ...
@@ -179,7 +160,7 @@ you have few different options:
     N = x.shape[-1]
 
     # define model
-    model = Unet(backbone_name='resnet34', encoder_weights=None, input_shape=(None, None, N))
+    model = Unet(backbone_name='resnet50', encoder_weights=None, input_shape=(None, None, N))
 
     # continue with usual steps: compile, fit, etc..
 
@@ -187,7 +168,7 @@ you have few different options:
 
 .. code-block:: python
 
-    from segmentation_models import Unet
+    from segmodels_keras import Unet
     from keras.layers import Input, Conv2D
     from keras.models import Model
 
@@ -197,7 +178,7 @@ you have few different options:
     # define number of channels
     N = x.shape[-1]
 
-    base_model = Unet(backbone_name='resnet34', encoder_weights='imagenet')
+    base_model = Unet(backbone_name='resnet50', encoder_weights='imagenet')
 
     inp = Input(shape=(None, None, N))
     l1 = Conv2D(3, (1, 1))(inp) # map N channels data to 3 channels

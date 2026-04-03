@@ -1,6 +1,6 @@
 Support
 =======
 
-The easiest way to get help with the project is to create issue or PR on github.
+The easiest way to get help with the project is to create an issue or PR on GitHub.
 
-Github: http://github.com/qubvel/segmentation_models/issues
+GitHub: http://github.com/orthoseg/segmodels_keras/issues

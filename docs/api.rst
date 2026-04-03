@@ -1,39 +1,39 @@
-Segmentation Models Python API
+segmodels_keras Python API
 ==============================
 
 
-Getting started with segmentation models is easy.
+Getting started is easy.
 
 Unet
 ~~~~
-.. autofunction:: segmentation_models.Unet
+.. autofunction:: segmodels_keras.Unet
 
 Linknet
 ~~~~~~~
-.. autofunction:: segmentation_models.Linknet
+.. autofunction:: segmodels_keras.Linknet
 
 FPN
 ~~~
-.. autofunction:: segmentation_models.FPN
+.. autofunction:: segmodels_keras.FPN
 
 PSPNet
 ~~~~~~
-.. autofunction:: segmentation_models.PSPNet
+.. autofunction:: segmodels_keras.PSPNet
 
 metrics
 ~~~~~~~
-.. autofunction:: segmentation_models.metrics.IOUScore
-.. autofunction:: segmentation_models.metrics.FScore
+.. autofunction:: segmodels_keras.metrics.IOUScore
+.. autofunction:: segmodels_keras.metrics.FScore
 
 losses
 ~~~~~~
-.. autofunction:: segmentation_models.losses.JaccardLoss
-.. autofunction:: segmentation_models.losses.DiceLoss
-.. autofunction:: segmentation_models.losses.BinaryCELoss
-.. autofunction:: segmentation_models.losses.CategoricalCELoss
-.. autofunction:: segmentation_models.losses.BinaryFocalLoss
-.. autofunction:: segmentation_models.losses.CategoricalFocalLoss
+.. autofunction:: segmodels_keras.losses.JaccardLoss
+.. autofunction:: segmodels_keras.losses.DiceLoss
+.. autofunction:: segmodels_keras.losses.BinaryCELoss
+.. autofunction:: segmodels_keras.losses.CategoricalCELoss
+.. autofunction:: segmodels_keras.losses.BinaryFocalLoss
+.. autofunction:: segmodels_keras.losses.CategoricalFocalLoss
 
 utils
 ~~~~~
-.. autofunction:: segmentation_models.utils.set_trainable
+.. autofunction:: segmodels_keras.utils.set_trainable
