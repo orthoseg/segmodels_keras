@@ -1,5 +1,6 @@
+###########
 Quick start
-~~~~~~~~~~~
+###########
 Since the library is built on the Keras framework, created segmentation model is just a
 Keras Model, which can be created as easy as:
 
@@ -28,8 +29,9 @@ Change input shape of the model:
 
     model = Unet('resnet50', input_shape=(None, None, 6), encoder_weights=None)
 
+************************
 Simple training pipeline
-~~~~~~~~~~~~~~~~~~~~~~~~
+************************
 
 .. code:: python
 
@@ -61,8 +63,10 @@ Simple training pipeline
        validation_data=(x_val, y_val),
    )
 
+********************
 Models and Backbones
-~~~~~~~~~~~~~~~~~~~~
+********************
+
 **Models**
 
 -  `Unet <https://arxiv.org/abs/1505.04597>`__
@@ -112,8 +116,9 @@ EfficientNetV2  ``'efficientnetv2m'``
     (``encoder_weights='imagenet'``).
 
 
+***********
 Fine tuning
-~~~~~~~~~~~
+***********
 
 Some times, it is useful to train only randomly initialized
 *decoder* in order not to damage weights of properly trained
@@ -139,8 +144,9 @@ while initializing the model.
     model.fit(x, y, epochs=100)
 
 
+**************************
 Training with non-RGB data
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+**************************
 
 In case you have non RGB images (e.g. grayscale or some medical/remote sensing data)
 you have few different options:
