@@ -1,5 +1,4 @@
 import keras
-from packaging.version import parse
+from packaging.version import parse as parse_version
 
-keras_version = keras.__version__
-KERAS_GTE_3 = parse(keras_version) >= parse("3.0.0")
+KERAS_GTE_3 = parse_version(keras.__version__) >= parse_version("3.0.0")
