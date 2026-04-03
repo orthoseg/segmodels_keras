@@ -107,4 +107,4 @@ html_static_path = ['_static']
 
 # -- Extension configuration -------------------------------------------------
 
-autodoc_mock_imports = ['skimage', 'keras', 'tensorflow']
+# autodoc_mock_imports = ['skimage', 'keras', 'tensorflow']
