@@ -22,12 +22,11 @@ compatibility,... or support for all features is not guaranteed.
 
 **The main features** of this library are:
 
--  High level API (just two lines of code to create model for segmentation)
--  **4** models architectures for binary and multi-class image segmentation
-   (including legendary **Unet**)
--  **20+** available backbones for each architecture
--  All backbones have **pre-trained** weights for faster and better
-   convergence
+- High level API (just two lines of code to create model for segmentation)
+- **4** model architectures for binary and multi-class image segmentation
+  (including legendary **Unet**)
+- **20+** available backbones for each architecture
+- All backbones have **pre-trained** weights for faster and better convergence
 - Helpful segmentation losses (Jaccard, Dice, Focal) and metrics (IoU, F-score)
 
 
