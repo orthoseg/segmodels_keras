@@ -5,7 +5,6 @@ Installation
 
 1) Python 3
 2) Keras >= 2.10 or TensorFlow >= 2.10
-3) keras-applications >= 1.0.7, <=1.0.8
 
 
 .. note::
@@ -19,13 +18,13 @@ Installation
 
 .. code:: bash
 
-    $ pip install segmentation-models
+    $ pip install segmodels-keras
 
 **Latest version**
 
 .. code:: bash
 
-    $ pip install git+https://github.com/qubvel/segmentation_models
+    $ pip install git+https://github.com/orthoseg/segmodels_keras
 
 .. _Guide:
     https://www.tensorflow.org/install/
