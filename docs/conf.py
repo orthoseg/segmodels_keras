@@ -104,7 +104,3 @@ html_static_path = ['_static']
 # 'searchbox.html']``.
 #
 # html_sidebars = {}
-
-# -- Extension configuration -------------------------------------------------
-
-# autodoc_mock_imports = ['skimage', 'keras', 'tensorflow']
