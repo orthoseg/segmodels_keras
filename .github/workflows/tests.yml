@@ -5,9 +5,9 @@ name: Tests
 
 on:
   push:
-    branches: [ main, v2.** ]
+    branches: [ main, v0.** ]
   pull_request:
-    branches: [ main, v2.** ]
+    branches: [ main, v0.** ]
     paths-ignore:
       - "docs/**"
       - "examples/**"
