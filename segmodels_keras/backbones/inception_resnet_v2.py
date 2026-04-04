@@ -416,12 +416,19 @@ def preprocess_input(x, data_format=None):
 
 
 def decode_predictions(preds, top=5):
+    """Decodes the prediction of an ImageNet model.
+
+    Args:
+        preds: NumPy array encoding a batch of predictions.
+        top: Integer, how many top-guesses to return. Defaults to `5`.
+
+    Returns:
+        A list of lists of top class prediction tuples
+        `(class_name, class_description, score)`.
+        One list of tuples per sample in batch input.
+
+    Raises:
+        ValueError: In case of invalid shape of the `pred` array
+            (must be 2D).
+    """
     return imagenet_utils.decode_predictions(preds, top=top)
-
-
-preprocess_input.__doc__ = imagenet_utils.PREPROCESS_INPUT_DOC.format(
-    mode="",
-    ret=imagenet_utils.PREPROCESS_INPUT_RET_DOC_TF,
-    error=imagenet_utils.PREPROCESS_INPUT_ERROR_DOC,
-)
-decode_predictions.__doc__ = imagenet_utils.decode_predictions.__doc__
