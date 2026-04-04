@@ -1,3 +1,12 @@
+|Actions Status| |PyPI version|
+
+.. |Actions Status| image:: https://github.com/orthoseg/segmodels_keras/actions/workflows/tests.yml/badge.svg?branch=main
+   :target: https://github.com/orthoseg/segmodels_keras/actions/workflows/tests.yml?query=workflow%3ATests
+
+.. |PyPI version| image:: https://img.shields.io/pypi/v/segmodels-keras.svg
+   :target: https://pypi.org/project/segmodels-keras
+
+
 ###############
 segmodels_keras
 ###############
@@ -26,8 +35,11 @@ compatibility,... or support for all features is not guaranteed.
 
 Documentation
 ~~~~~~~~~~~~~
-Latest **documentation** is avaliable on `Read the
-Docs <https://segmodels_keras.readthedocs.io/en/latest/>`__
+The **documentation** of the current stable version is available here:
+`Read the docs, stable <https://segmodels_keras.readthedocs.io/en/stable/>`__.
+
+The lastest version of the documentation (= of the main branch) can be found here:
+`Read the docs, latest <https://segmodels_keras.readthedocs.io/en/latest/>`__.
 
 Change Log
 ~~~~~~~~~~
