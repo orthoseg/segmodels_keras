@@ -13,7 +13,11 @@ https://github.com/tensorflow/models/tree/master/research/slim#pre-trained-model
 - [Inception-v4, Inception-ResNet and the Impact of
    Residual Connections on Learning](https://arxiv.org/abs/1602.07261) (AAAI 2017)
 
-Differences with the original implementation in keras.applications:
+The differences retained from the segmentation_models version
+(https://github.com/qubvel/segmentation_models/blob/master/segmentation_models/backbones/inception_resnet_v2.py)
+compared to the most recent version in keras.applications
+(https://github.com/keras-team/keras/blob/86d7deacb0ac2baa3e41db4bcd61775065b5a301/keras/src/applications/inception_resnet_v2.py)
+are the following:
 - For e.g. in the `conv2d_bn` blocks, padding="same" is used instead of "valid". This is
   to make the sizes of the outputs of the layers the correct size for the skip
   connections for the decoders in the segmentation models. It does not affect the
@@ -24,11 +28,10 @@ Differences with the original implementation in keras.applications:
   also give issues when loading weights that were saved with an older version. An
   example where this solution is used/shown can be found here:
   https://github.com/ayushdabra/dubai-satellite-imagery-segmentation/blob/9446e16134e752dda080ba9d65be18ea47fa26a9/get_activations.py#L40
-- The original implementation uses different imports as it is internal in keras, and
-  here we need to use the public API of keras.
-- Use Lambda layer instead of CustomScaleLayer because:
-    - it avoids having to define + pass in a custom layer when loading the model
-    - otherwise "old" weights cannot be loaded when using keras 3
+- The keras.applications implementation uses different imports as it is internal in
+  keras, and here we need to use the public API of keras.
+- Keep using the Lambda layer instead of CustomScaleLayer to avoid having to pass it in
+  with `custom_objects` when loading the model.
 """
 
 import warnings

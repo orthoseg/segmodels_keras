@@ -125,14 +125,16 @@ class BackbonesFactory:
         "inceptionresnetv2": (
             irv2.InceptionResNetV2,
             irv2.preprocess_input,
-            (
-                "activation_161",
-                "activation_74",
-                "activation_3",
-                "activation",
-                # "input_1",
-            ),
-            # (594, 260, 16, 9),
+            # Use the layer indexes instead of names because otherwise loading weights
+            # saved with keras 2 cannot be loaded with keras 3.
+            # (
+            #     "activation_161",
+            #     "activation_74",
+            #     "activation_3",
+            #     "activation",
+            #     # "input_1",
+            # ),
+            (594, 260, 16, 9),
         ),
         "inceptionv3": (iv3.InceptionV3, iv3.preprocess_input, (228, 86, 16, 9)),
         # MobileNet
