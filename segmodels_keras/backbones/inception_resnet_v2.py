@@ -26,6 +26,8 @@ Differences with the original implementation in keras.applications:
   https://github.com/ayushdabra/dubai-satellite-imagery-segmentation/blob/9446e16134e752dda080ba9d65be18ea47fa26a9/get_activations.py#L40
 - The original implementation uses different imports as it is internal in keras, and
   here we need to use the public API of keras.
+- Use Lambda layer instead of CustomScaleLayer as it avoids having to define a custom
+  layer and because otherwise "old" weights are incompatible.
 """
 
 import warnings
@@ -308,20 +310,6 @@ def conv2d_bn(
     return x
 
 
-class CustomScaleLayer(Layer):
-    def __init__(self, scale, **kwargs):
-        super().__init__(**kwargs)
-        self.scale = scale
-
-    def get_config(self):
-        config = super().get_config()
-        config.update({"scale": self.scale})
-        return config
-
-    def call(self, inputs):
-        return inputs[0] + inputs[1] * self.scale
-
-
 def inception_resnet_block(x, scale, block_type, block_idx, activation="relu"):
     """Adds a Inception-ResNet block.
 
@@ -398,9 +386,16 @@ def inception_resnet_block(x, scale, block_type, block_idx, activation="relu"):
         name=f"{block_name}_conv",
     )
 
-    x = CustomScaleLayer(scale)([x, up])
+    x = layers.Lambda(
+        lambda inputs, scale: inputs[0] + inputs[1] * scale,
+        output_shape=backend.int_shape(x)[1:],
+        arguments={"scale": scale},
+        name=block_name,
+    )([x, up])
+
     if activation is not None:
         x = layers.Activation(activation, name=f"{block_name}_ac")(x)
+
     return x
 
 
@@ -502,17 +497,15 @@ def _obtain_input_shape(
         if data_format == "channels_first":
             if input_shape is not None:
                 if len(input_shape) != 3:
-                    raise ValueError(
-                        "`input_shape` must be a tuple of three integers."
-                    )
+                    raise ValueError("`input_shape` must be a tuple of three integers.")
                 if input_shape[0] != 3 and weights == "imagenet":
                     raise ValueError(
                         "The input must have 3 channels; Received "
                         f"`input_shape={input_shape}`"
                     )
-                if (
-                    input_shape[1] is not None and input_shape[1] < min_size
-                ) or (input_shape[2] is not None and input_shape[2] < min_size):
+                if (input_shape[1] is not None and input_shape[1] < min_size) or (
+                    input_shape[2] is not None and input_shape[2] < min_size
+                ):
                     raise ValueError(
                         f"Input size must be at least {min_size}"
                         f"x{min_size}; Received: "
@@ -521,17 +514,15 @@ def _obtain_input_shape(
         else:
             if input_shape is not None:
                 if len(input_shape) != 3:
-                    raise ValueError(
-                        "`input_shape` must be a tuple of three integers."
-                    )
+                    raise ValueError("`input_shape` must be a tuple of three integers.")
                 if input_shape[-1] != 3 and weights == "imagenet":
                     raise ValueError(
                         "The input must have 3 channels; Received "
                         f"`input_shape={input_shape}`"
                     )
-                if (
-                    input_shape[0] is not None and input_shape[0] < min_size
-                ) or (input_shape[1] is not None and input_shape[1] < min_size):
+                if (input_shape[0] is not None and input_shape[0] < min_size) or (
+                    input_shape[1] is not None and input_shape[1] < min_size
+                ):
                     raise ValueError(
                         "Input size must be at least "
                         f"{min_size}x{min_size}; Received: "
