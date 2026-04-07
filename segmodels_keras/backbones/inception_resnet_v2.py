@@ -388,7 +388,7 @@ def inception_resnet_block(x, scale, block_type, block_idx, activation="relu"):
 
     x = layers.Lambda(
         lambda inputs, scale: inputs[0] + inputs[1] * scale,
-        output_shape=backend.int_shape(x)[1:],
+        output_shape=x.shape[1:],
         arguments={"scale": scale},
         name=block_name,
     )([x, up])
