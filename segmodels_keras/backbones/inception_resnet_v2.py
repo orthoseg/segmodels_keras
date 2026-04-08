@@ -30,8 +30,6 @@ are the following:
   https://github.com/ayushdabra/dubai-satellite-imagery-segmentation/blob/9446e16134e752dda080ba9d65be18ea47fa26a9/get_activations.py#L40
 - The keras.applications implementation uses different imports as it is internal in
   keras, and here we need to use the public API of keras.
-- Keep using the Lambda layer instead of CustomScaleLayer to avoid having to pass it in
-  with `custom_objects` when loading the model.
 """
 
 import warnings
@@ -39,7 +37,6 @@ from pathlib import Path
 
 from keras import backend, layers, models
 from keras.applications import imagenet_utils
-from keras.layers import Layer
 from keras.utils import get_file, get_source_inputs
 
 BASE_WEIGHT_URL = (
@@ -314,6 +311,20 @@ def conv2d_bn(
     return x
 
 
+class CustomScaleLayer(layers.Layer):
+    def __init__(self, scale, **kwargs):
+        super().__init__(**kwargs)
+        self.scale = scale
+
+    def get_config(self):
+        config = super().get_config()
+        config.update({"scale": self.scale})
+        return config
+
+    def call(self, inputs):
+        return inputs[0] + inputs[1] * self.scale
+
+
 def inception_resnet_block(x, scale, block_type, block_idx, activation="relu"):
     """Adds a Inception-ResNet block.
 
@@ -390,12 +401,7 @@ def inception_resnet_block(x, scale, block_type, block_idx, activation="relu"):
         name=f"{block_name}_conv",
     )
 
-    x = layers.Lambda(
-        lambda inputs, scale: inputs[0] + inputs[1] * scale,
-        output_shape=x.shape[1:],
-        arguments={"scale": scale},
-        name=block_name,
-    )([x, up])
+    x = CustomScaleLayer(scale)([x, up])
 
     if activation is not None:
         x = layers.Activation(activation, name=f"{block_name}_ac")(x)
@@ -432,6 +438,10 @@ def decode_predictions(preds, top=5):
             (must be 2D).
     """
     return imagenet_utils.decode_predictions(preds, top=top)
+
+
+def get_custom_objects():
+    return {"CustomScaleLayer": CustomScaleLayer}
 
 
 def _obtain_input_shape(

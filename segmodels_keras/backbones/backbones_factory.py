@@ -274,5 +274,10 @@ class BackbonesFactory:
     def get_preprocessing(self, name):
         return self._models.get(name)[1]
 
+    def get_custom_objects(self, name):
+        if name == "inceptionresnetv2":
+            return irv2.get_custom_objects()
+        return {}
+
 
 Backbones = BackbonesFactory()
