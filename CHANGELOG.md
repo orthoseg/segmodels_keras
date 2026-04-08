@@ -17,7 +17,7 @@
  - Add extra backbones: resnet50v2, resnet101v2, resnet152v2 and efficientnetv2m (#6)
  - Add support for keras v3 (#5)
  - Use implementation + weights of keras.applications for inceptionresnetv2 and just
-   retain the customizations needed for the skip connections (#13, #14, #16)
+   retain the customizations needed for the skip connections (#13, #14)
  - Improve code consistency using ruff (#4)
 
 ### segmentation_models
