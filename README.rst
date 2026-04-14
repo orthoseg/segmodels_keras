@@ -1,7 +1,10 @@
-|Actions Status| |PyPI version|
+|Actions Status| |Code coverage| |PyPI version|
 
 .. |Actions Status| image:: https://github.com/orthoseg/segmodels_keras/actions/workflows/tests.yml/badge.svg?branch=main
    :target: https://github.com/orthoseg/segmodels_keras/actions/workflows/tests.yml?query=workflow%3ATests
+
+.. |Code coverage| image:: https://codecov.io/gh/orthoseg/segmodels_keras/graph/badge.svg?token=o01OyTMDuj 
+   :target: https://codecov.io/gh/orthoseg/segmodels_keras
 
 .. |PyPI version| image:: https://img.shields.io/pypi/v/segmodels-keras.svg
    :target: https://pypi.org/project/segmodels-keras
