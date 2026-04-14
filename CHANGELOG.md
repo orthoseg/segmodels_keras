@@ -16,6 +16,7 @@
 ###### Areas of improvement
  - Add extra backbones: resnet50v2, resnet101v2, resnet152v2 and efficientnetv2m (#6)
  - Add support for keras v3 (#5)
+ - add support to provide weights without top when creating a model (#19)
  - Use implementation + weights of keras.applications for inceptionresnetv2 and just
    retain the customizations needed for the skip connections (#13, #14)
  - Improve code consistency using ruff (#4)
