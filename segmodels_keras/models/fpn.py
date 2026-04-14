@@ -107,6 +107,7 @@ def build_fpn(
     use_batchnorm=True,
     aggregation="sum",
     dropout=None,
+    weights_notop=None,
 ):
     input_ = backbone.input
     x = backbone.output
@@ -172,6 +173,12 @@ def build_fpn(
         size=(2, 2), interpolation="bilinear", name="final_upsampling"
     )(x)
 
+    # load weights without top if path provided
+    if weights_notop is not None:
+        model_notop = models.Model(input_, x)
+        model_notop.load_weights(weights_notop)
+        x = model_notop.output
+
     # model head (define number of output classes)
     x = layers.Conv2D(
         filters=classes,
@@ -200,6 +207,7 @@ def FPN(
     classes=21,
     activation="softmax",
     weights=None,
+    weights_notop=None,
     encoder_weights="imagenet",
     encoder_freeze=False,
     encoder_features="default",
@@ -219,7 +227,9 @@ def FPN(
             your model be able to process images af any size, but ``H`` and ``W`` of
             input images should be divisible by factor ``32``.
         classes: a number of classes for output (output shape - ``(h, w, classes)``).
-        weights: optional, path to model weights.
+        weights: optional, path to model weights to be loaded.
+        weights_notop: optional, path to model weights without top (without segmentation
+            head) to be loaded.
         activation: name of one of ``keras.activations`` for last model layer
             (e.g. ``sigmoid``, ``softmax``, ``linear``).
         encoder_weights: one of ``None`` (random initialization), ``imagenet``
@@ -265,6 +275,7 @@ def FPN(
         activation=activation,
         classes=classes,
         aggregation=pyramid_aggregation,
+        weights_notop=weights_notop,
     )
 
     # lock encoder weights for fine-tuning

@@ -141,6 +141,7 @@ def build_linknet(
     classes=1,
     activation="sigmoid",
     use_batchnorm=True,
+    weights_notop=None,
 ):
     input_ = backbone.input
     x = backbone.output
@@ -169,6 +170,12 @@ def build_linknet(
             x, skip
         )
 
+    # load weights without top if path provided
+    if weights_notop is not None:
+        model_notop = models.Model(input_, x)
+        model_notop.load_weights(weights_notop)
+        x = model_notop.output
+
     # model head (define number of output classes)
     x = layers.Conv2D(
         filters=classes,
@@ -196,6 +203,7 @@ def Linknet(
     classes=1,
     activation="sigmoid",
     weights=None,
+    weights_notop=None,
     encoder_weights="imagenet",
     encoder_freeze=False,
     encoder_features="default",
@@ -219,7 +227,9 @@ def Linknet(
         classes: a number of classes for output (output shape - ``(h, w, classes)``).
         activation: name of one of ``keras.activations`` for last model layer
             (e.g. ``sigmoid``, ``softmax``, ``linear``).
-        weights: optional, path to model weights.
+        weights: optional, path to model weights to be loaded.
+        weights_notop: optional, path to model weights without top (without segmentation
+            head) to be loaded.
         encoder_weights: one of ``None`` (random initialization), ``imagenet``
             (pre-training on ImageNet).
         encoder_freeze: if ``True`` set all layers of encoder (backbone model) as
@@ -274,6 +284,7 @@ def Linknet(
         activation=activation,
         n_upsample_blocks=len(decoder_filters),
         use_batchnorm=decoder_use_batchnorm,
+        weights_notop=weights_notop,
     )
 
     # lock encoder weights for fine-tuning

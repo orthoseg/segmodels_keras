@@ -124,6 +124,7 @@ def build_psp(
     classes=21,
     activation="softmax",
     dropout=None,
+    weights_notop=None,
 ):
     input_ = backbone.input
     x = (
@@ -146,6 +147,12 @@ def build_psp(
     # model regularization
     if dropout is not None:
         x = layers.SpatialDropout2D(dropout, name="spatial_dropout")(x)
+
+    # load weights without top if path provided
+    if weights_notop is not None:
+        model_notop = models.Model(input_, x)
+        model_notop.load_weights(weights_notop)
+        x = model_notop.output
 
     # model head
     x = layers.Conv2D(
@@ -177,6 +184,7 @@ def PSPNet(
     classes=21,
     activation="softmax",
     weights=None,
+    weights_notop=None,
     encoder_weights="imagenet",
     encoder_freeze=False,
     downsample_factor=8,
@@ -197,7 +205,9 @@ def PSPNet(
         classes: a number of classes for output (output shape - ``(h, w, classes)``).
         activation: name of one of ``keras.activations`` for last model layer
             (e.g. ``sigmoid``, ``softmax``, ``linear``).
-        weights: optional, path to model weights.
+        weights: optional, path to model weights to be loaded.
+        weights_notop: optional, path to model weights without top (without segmentation
+            head) to be loaded.
         encoder_weights: one of ``None`` (random initialization), ``imagenet``
             (pre-training on ImageNet).
         encoder_freeze: if ``True`` set all layers of encoder (backbone model) as
@@ -250,6 +260,7 @@ def PSPNet(
         classes=classes,
         activation=activation,
         dropout=psp_dropout,
+        weights_notop=weights_notop,
     )
 
     # lock encoder weights for fine-tuning

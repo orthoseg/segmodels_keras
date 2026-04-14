@@ -106,5 +106,45 @@ def test_activity_reg(case):
     _test_regularizer(model, reg_model, x, y)
 
 
+@pytest.mark.parametrize("decoder", ["fpn", "linknet", "unet", "pspnet"])
+def test_save_model_weights_notop(tmp_path, decoder):
+    backbone_name = "mobilenetv2"
+    if decoder == "pspnet":
+        model = sm.PSPNet(backbone_name, encoder_weights=None)
+    elif decoder == "fpn":
+        model = sm.FPN(backbone_name, encoder_weights=None)
+    elif decoder == "linknet":
+        model = sm.Linknet(backbone_name, encoder_weights=None)
+    elif decoder == "unet":
+        model = sm.Unet(backbone_name, encoder_weights=None)
+    else:
+        raise ValueError(f"Incorrect decoder {decoder}")
+
+    # Test saving the model weights without the top layers
+    path = tmp_path / f"{decoder}.weights.h5"
+    sm.utils.save_model_weights_notop(model, decoder=decoder, path=path)
+
+    # Test loading the model weights without the top layers again
+    assert path.exists()
+    if decoder == "pspnet":
+        model = sm.PSPNet(backbone_name, weights_notop=path)
+    elif decoder == "fpn":
+        model = sm.FPN(backbone_name, weights_notop=path)
+    elif decoder == "linknet":
+        model = sm.Linknet(backbone_name, weights_notop=path)
+    elif decoder == "unet":
+        model = sm.Unet(backbone_name, weights_notop=path)
+    else:
+        raise ValueError(f"Incorrect decoder {decoder}")
+
+
+def test_save_model_weights_notop_invalid_decoder():
+    model = keras.models.Model()
+    with pytest.raises(ValueError, match="Decoder should be one of"):
+        sm.utils.save_model_weights_notop(
+            model, decoder="invalid_decoder", path="path/to/weights.h5"
+        )
+
+
 if __name__ == "__main__":
     pytest.main([__file__])
