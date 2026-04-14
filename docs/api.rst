@@ -37,3 +37,4 @@ losses
 utils
 ~~~~~
 .. autofunction:: segmodels_keras.utils.set_trainable
+.. autofunction:: segmodels_keras.utils.save_model_weights_notop
