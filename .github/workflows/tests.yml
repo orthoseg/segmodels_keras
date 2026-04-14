@@ -84,4 +84,4 @@ jobs:
           --cov=segmodels_keras --cov-append --cov-report term-missing --cov-report 
           xml tests/
 
-      - uses: codecov/codecov-action@v5
+      - uses: codecov/codecov-action@v6
