@@ -125,6 +125,7 @@ def build_psp(
     activation="softmax",
     dropout=None,
     weights_notop=None,
+    freeze_notop=False,
 ):
     input_ = backbone.input
     x = (
@@ -152,6 +153,8 @@ def build_psp(
     if weights_notop is not None:
         model_notop = models.Model(input_, x)
         model_notop.load_weights(weights_notop)
+        if freeze_notop:
+            freeze_model(model_notop)
         x = model_notop.output
 
     # model head
@@ -185,6 +188,7 @@ def PSPNet(
     activation="softmax",
     weights=None,
     weights_notop=None,
+    freeze_notop=False,
     encoder_weights="imagenet",
     encoder_freeze=False,
     downsample_factor=8,
@@ -208,6 +212,8 @@ def PSPNet(
         weights: optional, path to model weights to be loaded.
         weights_notop: optional, path to model weights without top (without segmentation
             head) to be loaded.
+        freeze_notop: if ``True``, set all layers of the model except the top as
+            non-trainable.
         encoder_weights: one of ``None`` (random initialization), ``imagenet``
             (pre-training on ImageNet).
         encoder_freeze: if ``True`` set all layers of encoder (backbone model) as
@@ -261,6 +267,7 @@ def PSPNet(
         activation=activation,
         dropout=psp_dropout,
         weights_notop=weights_notop,
+        freeze_notop=freeze_notop,
     )
 
     # lock encoder weights for fine-tuning

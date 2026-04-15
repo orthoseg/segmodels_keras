@@ -127,13 +127,13 @@ def test_save_model_weights_notop(tmp_path, decoder):
     # Test loading the model weights without the top layers again
     assert path.exists()
     if decoder == "pspnet":
-        model = sm.PSPNet(backbone_name, weights_notop=path)
+        model = sm.PSPNet(backbone_name, weights_notop=path, freeze_notop=True)
     elif decoder == "fpn":
-        model = sm.FPN(backbone_name, weights_notop=path)
+        model = sm.FPN(backbone_name, weights_notop=path, freeze_notop=True)
     elif decoder == "linknet":
-        model = sm.Linknet(backbone_name, weights_notop=path)
+        model = sm.Linknet(backbone_name, weights_notop=path, freeze_notop=True)
     elif decoder == "unet":
-        model = sm.Unet(backbone_name, weights_notop=path)
+        model = sm.Unet(backbone_name, weights_notop=path, freeze_notop=True)
     else:
         raise ValueError(f"Incorrect decoder {decoder}")
 
