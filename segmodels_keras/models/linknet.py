@@ -142,6 +142,7 @@ def build_linknet(
     activation="sigmoid",
     use_batchnorm=True,
     weights_notop=None,
+    freeze_notop=False,
 ):
     input_ = backbone.input
     x = backbone.output
@@ -174,6 +175,8 @@ def build_linknet(
     if weights_notop is not None:
         model_notop = models.Model(input_, x)
         model_notop.load_weights(weights_notop)
+        if freeze_notop:
+            freeze_model(model_notop)
         x = model_notop.output
 
     # model head (define number of output classes)
@@ -204,6 +207,7 @@ def Linknet(
     activation="sigmoid",
     weights=None,
     weights_notop=None,
+    freeze_notop=False,
     encoder_weights="imagenet",
     encoder_freeze=False,
     encoder_features="default",
@@ -230,6 +234,8 @@ def Linknet(
         weights: optional, path to model weights to be loaded.
         weights_notop: optional, path to model weights without top (without segmentation
             head) to be loaded.
+        freeze_notop: if ``True``, set all layers of the model except the top as
+            non-trainable.
         encoder_weights: one of ``None`` (random initialization), ``imagenet``
             (pre-training on ImageNet).
         encoder_freeze: if ``True`` set all layers of encoder (backbone model) as
@@ -285,6 +291,7 @@ def Linknet(
         n_upsample_blocks=len(decoder_filters),
         use_batchnorm=decoder_use_batchnorm,
         weights_notop=weights_notop,
+        freeze_notop=freeze_notop,
     )
 
     # lock encoder weights for fine-tuning
