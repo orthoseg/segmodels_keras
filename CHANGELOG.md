@@ -9,7 +9,6 @@
    (#1, #3)
  - Support of keras v1 was dropped.
  - Support for following backbones was dropped:
-     - resnet18, resnet34
      - seresnet18, seresnet34, seresnet101, seresnet152
      - seresnext50, seresnext101, senet154
 
