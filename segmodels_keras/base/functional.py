@@ -60,7 +60,7 @@ def round_if_needed(x, threshold, **kwargs):
     return x
 
 
-def average(x, per_image=False, class_weights=None, **kwargs):
+def average(x, per_image=False, class_weights=None, **kwargs):  # noqa: ARG001
     if per_image:
         x = ops.mean(x, axis=0)
     if class_weights is not None:
@@ -308,7 +308,7 @@ def categorical_crossentropy(gt, pr, class_weights=1.0, class_indexes=None, **kw
     return -ops.mean(output)
 
 
-def binary_crossentropy(gt, pr, **kwargs):
+def binary_crossentropy(gt, pr, **kwargs):  # noqa: ARG001
     return ops.mean(ops.binary_crossentropy(gt, pr))
 
 
@@ -338,7 +338,7 @@ def categorical_focal_loss(gt, pr, gamma=2.0, alpha=0.25, class_indexes=None, **
     return ops.mean(loss)
 
 
-def binary_focal_loss(gt, pr, gamma=2.0, alpha=0.25, **kwargs):
+def binary_focal_loss(gt, pr, gamma=2.0, alpha=0.25, **kwargs):  # noqa: ARG001
     r"""Implementation of Focal Loss from the paper in binary classification
 
     Formula:
