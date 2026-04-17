@@ -17,17 +17,20 @@ class BackbonesFactory:
     """
 
     _models = {  # noqa: RUF012
-        # ResNets < 50 layers are NOT available via keras.applications, so use
-        # implementation from classification_models.
+        # ResNets < 50 layers are NOT available via keras.applications, so use a
+        # torchvision-compatible post-activation BasicBlock implementation.
+        # Layer names follow the keras.applications ResNet50+ naming convention.
         "resnet18": (
             resnet.ResNet18,
             resnet.preprocess_input,
-            ("stage4_unit1_relu1", "stage3_unit1_relu1", "stage2_unit1_relu1", "relu0"),
+            # resnet18: layer1=2, layer2=2, layer3=2, layer4=2 blocks
+            ("conv5_block2_out", "conv4_block2_out", "conv3_block2_out", "conv1_relu"),
         ),
         "resnet34": (
             resnet.ResNet34,
             resnet.preprocess_input,
-            ("stage4_unit1_relu1", "stage3_unit1_relu1", "stage2_unit1_relu1", "relu0"),
+            # resnet34: layer1=3, layer2=4, layer3=6, layer4=3 blocks
+            ("conv5_block3_out", "conv4_block6_out", "conv3_block4_out", "conv1_relu"),
         ),
         # ResNets > 50 layers are available via keras.applications, so use those.
         # Skip layers (inverted) from https://github.com/yingkaisha/keras-unet-collection
