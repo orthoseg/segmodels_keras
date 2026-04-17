@@ -20,13 +20,7 @@ def str2bool(v):
 
 
 def get_backbones():
-    is_travis = str2bool(os.environ.get("TRAVIS", "False"))
-    exclude = ["efficientnetb6", "efficientnetb7"]
-    backbones = get_available_backbone_names()
-
-    if is_travis:
-        backbones = [b for b in backbones if b not in exclude]
-    return backbones
+    return get_available_backbone_names()
 
 
 BACKBONES = get_backbones()
@@ -35,7 +29,13 @@ BACKBONES = get_backbones()
 def _test_backbones(names):
     is_full = str2bool(os.environ.get("FULL_TEST", "False"))
     if not is_full:
-        return ["resnet50", "inceptionresnetv2", "efficientnetb0", "efficientnetv2m"]
+        return [
+            "resnet34",
+            "resnet50",
+            "inceptionresnetv2",
+            "efficientnetb0",
+            "efficientnetv2m",
+        ]
     else:
         return names
 

@@ -8,6 +8,7 @@ and that the input preprocessing function is also different (same as Xception).
 """
 
 import os
+import warnings
 
 from keras import backend, layers, models
 from keras import utils as keras_utils

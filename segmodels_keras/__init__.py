@@ -59,17 +59,17 @@ def set_framework(name):
     name = name.lower()
 
     if name == _KERAS_FRAMEWORK_NAME:
-        import keras
+        import keras  # noqa: PLC0415
     elif name == _TF_KERAS_FRAMEWORK_NAME:
-        from tensorflow import keras
+        from tensorflow import keras  # noqa: PLC0415
     else:
         raise ValueError(
             f"Not correct module name `{name}`, use `{_KERAS_FRAMEWORK_NAME}` or "
             f"`{_TF_KERAS_FRAMEWORK_NAME}`"
         )
 
-    global _KERAS_BACKEND, _KERAS_LAYERS, _KERAS_MODELS
-    global _KERAS_UTILS, _KERAS_LOSSES, _KERAS_FRAMEWORK
+    global _KERAS_BACKEND, _KERAS_LAYERS, _KERAS_MODELS  # noqa: PLW0603
+    global _KERAS_UTILS, _KERAS_LOSSES, _KERAS_FRAMEWORK  # noqa: PLW0603
 
     _KERAS_FRAMEWORK = name
     _KERAS_BACKEND = keras.backend

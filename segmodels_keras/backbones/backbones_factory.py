@@ -2,6 +2,7 @@ import keras.applications as ka
 
 from . import inception_resnet_v2 as irv2
 from . import inception_v3 as iv3
+from . import resnet
 
 
 class BackbonesFactory:
@@ -16,39 +17,37 @@ class BackbonesFactory:
     """
 
     _models = {  # noqa: RUF012
-        # ResNets
+        # ResNets < 50 layers are NOT available via keras.applications, so use
+        # implementation from classification_models.
+        "resnet18": (
+            resnet.ResNet18,
+            resnet.preprocess_input,
+            ("stage4_unit1_relu1", "stage3_unit1_relu1", "stage2_unit1_relu1", "relu0"),
+        ),
+        "resnet34": (
+            resnet.ResNet34,
+            resnet.preprocess_input,
+            ("stage4_unit1_relu1", "stage3_unit1_relu1", "stage2_unit1_relu1", "relu0"),
+        ),
+        # ResNets > 50 layers are available via keras.applications, so use those.
+        # Skip layers (inverted) from https://github.com/yingkaisha/keras-unet-collection
         "resnet50": (
             ka.ResNet50,
             ka.resnet.preprocess_input,
-            (
-                "conv4_block6_out",
-                "conv3_block4_out",
-                "conv2_block3_out",
-                "conv1_relu",
-            ),
+            ("conv4_block6_out", "conv3_block4_out", "conv2_block3_out", "conv1_relu"),
         ),
         "resnet101": (
             ka.ResNet101,
             ka.resnet.preprocess_input,
-            (
-                "conv4_block23_out",
-                "conv3_block4_out",
-                "conv2_block3_out",
-                "conv1_relu",
-            ),
+            ("conv4_block23_out", "conv3_block4_out", "conv2_block3_out", "conv1_relu"),
         ),
         "resnet152": (
             ka.ResNet152,
             ka.resnet.preprocess_input,
-            (
-                "conv4_block36_out",
-                "conv3_block8_out",
-                "conv2_block3_out",
-                "conv1_relu",
-            ),
+            ("conv4_block36_out", "conv3_block8_out", "conv2_block3_out", "conv1_relu"),
         ),
         # ResNetV2
-        # Layers reused from: https://github.com/yingkaisha/keras-unet-collection
+        # Skip layers (inverted) from https://github.com/yingkaisha/keras-unet-collection
         "resnet50v2": (
             ka.ResNet50V2,
             ka.resnet_v2.preprocess_input,
@@ -80,6 +79,7 @@ class BackbonesFactory:
             ),
         ),
         # VGG
+        # Skip layers from segmentation_models
         "vgg16": (
             ka.vgg16.VGG16,
             ka.vgg16.preprocess_input,
@@ -103,6 +103,7 @@ class BackbonesFactory:
             ),
         ),
         # DenseNet
+        # Skip layers (inverted) from https://github.com/yingkaisha/keras-unet-collection
         "densenet121": (
             ka.densenet.DenseNet121,
             ka.densenet.preprocess_input,
@@ -122,6 +123,7 @@ class BackbonesFactory:
             ("pool4_conv", "pool3_conv", "pool2_conv", "conv1/relu"),
         ),
         # Inception
+        # Skip layers from segmentation_models
         "inceptionresnetv2": (
             irv2.InceptionResNetV2,
             irv2.preprocess_input,
@@ -138,6 +140,7 @@ class BackbonesFactory:
         ),
         "inceptionv3": (iv3.InceptionV3, iv3.preprocess_input, (228, 86, 16, 9)),
         # MobileNet
+        # Skip layers from segmentation_models
         "mobilenet": (
             ka.mobilenet.MobileNet,
             ka.mobilenet.preprocess_input,
@@ -158,6 +161,8 @@ class BackbonesFactory:
                 "block_1_expand_relu",
             ),
         ),
+        # EfficientNet
+        # Skip layers from segmentation_models
         "efficientnetb0": [
             ka.EfficientNetB0,
             ka.efficientnet.preprocess_input,
@@ -239,7 +244,7 @@ class BackbonesFactory:
             ),
         ],
         # EfficientNetV2
-        # Layers reused from: https://github.com/chinefed/segmentation_models_fork
+        # Skip layers from https://github.com/chinefed/segmentation_models_fork
         "efficientnetv2m": (
             ka.EfficientNetV2M,
             ka.efficientnet_v2.preprocess_input,
