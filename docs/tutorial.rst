@@ -105,7 +105,7 @@ PSPNet        FPN
 Type            Names
 ==============  =====
 VGG             ``'vgg16' 'vgg19'``
-ResNet          ``'resnet50' 'resnet101' 'resnet152'``
+ResNet          ``'resnet18' 'resnet34' 'resnet50' 'resnet101' 'resnet152'``
 ResNetV2        ``'resnet50v2' 'resnet101v2' 'resnet152v2'``
 DenseNet        ``'densenet121' 'densenet169' 'densenet201'`` 
 Inception       ``'inceptionv3' 'inceptionresnetv2'``
