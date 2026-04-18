@@ -24,7 +24,9 @@ improvements and support for some extra backbone models.
 It is not meant as a full replacement of the original library, but rather as a
 solution for a library I developed and depended on segmentation_models:
 `orthoseg <https://github.com/orthoseg/orthoseg>`__ . Hence, full backwards
-compatibility,... or support for all features is not guaranteed.
+compatibility or support for all features is not an explicit goal. For example,
+the resnet backbones got small changes compared to the original library, so existing
+weights you saved for them won't be compatible.
 
 
 **The main features** of this library are:

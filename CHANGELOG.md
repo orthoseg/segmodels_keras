@@ -11,6 +11,15 @@
  - Support for following backbones was dropped:
      - seresnet18, seresnet34, seresnet101, seresnet152
      - seresnext50, seresnext101, senet154
+ - For resnet50, resnet101 and resnet152 the implementation was changed to use
+   keras.applications where the models are implemented slightly different, so weights
+   for the "old" models or for segmentation models based on those models will not be
+   compatible anymore.
+ - For resnet18 and resnet34 the implementation was changed so it is similar to
+   keras.applications and compatible with the torchvision of these models. This means
+   weights for the "old" models or for segmentation models based on those models will
+   not be compatible anymore. In addition, there are no "imagenet" weights available
+   anymore for these models.
 
 ###### Areas of improvement
  - Add extra backbones: resnet50v2, resnet101v2, resnet152v2 and efficientnetv2m (#6)
