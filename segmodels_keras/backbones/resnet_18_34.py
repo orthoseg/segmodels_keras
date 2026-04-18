@@ -358,6 +358,11 @@ def preprocess_input(x, **kwargs):
     """Torchvision-compatible ImageNet normalization (input in [0, 1])."""
     import numpy as np
 
-    mean = np.array([0.485, 0.456, 0.406], dtype="float32")
-    std = np.array([0.229, 0.224, 0.225], dtype="float32")
+    # FLAIR-compatible normalization (input in [0, 255]).
+    mean = np.array([105.08, 110.87, 101.82, 106.38, 53.26], dtype="float32")
+    std = np.array([52.17, 45.38, 44, 39.69, 79.3], dtype="float32")
+
+    # Torchvision-compatible ImageNet normalization (input in [0, 1]).
+    # mean = np.array([0.485, 0.456, 0.406], dtype="float32")
+    # std = np.array([0.229, 0.224, 0.225], dtype="float32")
     return (x - mean) / std
