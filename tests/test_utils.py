@@ -4,7 +4,7 @@ import pytest
 
 import segmodels_keras as sm
 from segmodels_keras import Unet
-from segmodels_keras._compat import load_weights
+from segmodels_keras._compat import _load_keras_v3_weights_hdf5
 from segmodels_keras.utils import set_regularization
 
 if sm.framework() == sm._TF_KERAS_FRAMEWORK_NAME:
@@ -172,7 +172,7 @@ def test_load_keras_v3_style_weights_hdf5(tmp_path):
     zero_weights = [np.zeros_like(weight) for weight in expected_weights]
     model.set_weights(zero_weights)
 
-    load_weights(model, path)
+    _load_keras_v3_weights_hdf5(model, path)
 
     for actual, expected in zip(model.get_weights(), expected_weights, strict=True):
         np.testing.assert_allclose(actual, expected)
@@ -219,7 +219,7 @@ def test_load_keras_v3_style_weights_hdf5_duplicate_signatures(tmp_path):
     for layer in dense_layers:
         layer.set_weights([np.zeros((4, 3), dtype=np.float32)])
 
-    load_weights(model, path)
+    _load_keras_v3_weights_hdf5(model, path)
 
     for layer, expected in zip(dense_layers, original_values):
         actual = layer.get_weights()[0]
