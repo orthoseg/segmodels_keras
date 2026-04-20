@@ -14,36 +14,31 @@ closely so that the two can be maintained together:
 Layer naming follows the same ``conv{N}_block{M}_*`` convention used by
 keras.applications, so models built here share the same weight-loading patterns.
 
-Note that the resulting resnet18 and resnet34 are not exactly the same as the version
-in https://github.com/qubvel/classification_models and hence is also different than
-the segmentation models in https://github.com/qubvel/segmentation_models.
-There are some differences in the bottom and top layers of the resnet, e.g. because
-the classification_models version applies also post-activation after the last residual
-block.
-
-This implementation is designed to be compatible with torchvision ResNet18/34 pretrained
-weights. Because the resnet implementation in keras.applications.resnet.ResNet (which
-only supports ResNet50+) already uses the same bottom and top layers this implementation
-is based on it, but in addition the following tweaks have been applied:
-- BatchNormalization uses ``momentum=0.9`` and ``epsilon=1e-5`` (torchvision defaults)
-  instead of the keras.applications defaults of ``momentum=0.99`` and
-  ``epsilon=1.001e-5``.
-  Note that momentum is only used during training. In addition, the value in pytorch
-  is inverted compared to the tf.keras implementation, so the default in pytorch
-  is actually ``momentum=0.1``, but after inversion we use ``momentum=0.9`` here.
-- The single bottom convolutional layer gets ``use_bias=False`` (like all convolutional
-  layers in the model just like the version in torchvision and in segmentation_models.
-  In the keras.applications ResNet(50+) implementation ``use_bias=True`` is used for the
-  single bottom convolutional layer.
+Notes:
+  - The resulting resnet18 and resnet34 are not exactly the same as the version in
+    https://github.com/qubvel/classification_models and hence is also different than
+    the segmentation models in https://github.com/qubvel/segmentation_models.
+    There are some differences in the bottom and top layers of the resnet, e.g. because
+    the classification_models version applies also post-activation after the last
+    residual block.
+  - The implementation is also ~ compatible with torchvision ResNet18/34 pretrained
+    weights based on a (rough) test. There are some small differences, but they don't
+    seem to influance the results significantly:
+      - BatchNormalization in torchvision uses ``momentum=0.9`` and ``epsilon=1e-5``
+        instead of the keras.applications defaults of ``momentum=0.99`` and
+        ``epsilon=1.001e-5`` used here.
+        Note that momentum is only used during training. In addition, the value in
+        pytorch is inverted compared to the tf.keras implementation, so the default in
+        pytorch is actually ``momentum=0.1``, but inverted this gives ``momentum=0.9``.
 """
 
 import os
 
-from segmodels_keras._compat import load_weights
-
 from keras import backend, layers, models
 from keras.applications import imagenet_utils
 from keras.utils import get_source_inputs
+
+from segmodels_keras._compat import load_weights
 
 from .resnet_common import _obtain_input_shape
 
@@ -369,22 +364,3 @@ def preprocess_input(x, data_format=None):
         Preprocessed array.
     """
     return imagenet_utils.preprocess_input(x, data_format=data_format, mode="tf")
-
-    """
-    # FLAIR-compatible normalization (input in [0, 255]).
-    mean = np.array([105.08, 110.87, 101.82, 106.38, 53.26], dtype="float32")
-    std = np.array([52.17, 45.38, 44, 39.69, 79.3], dtype="float32")
-
-    nb_channels = (
-        x.shape[-1] if backend.image_data_format() == "channels_last" else x.shape[1]
-    )
-    if nb_channels != len(mean):
-        mean = mean[:nb_channels]
-        std = std[:nb_channels]
-
-    # Torchvision-compatible ImageNet normalization (input in [0, 1]).
-    # mean = np.array([0.485, 0.456, 0.406], dtype="float32")
-    # std = np.array([0.229, 0.224, 0.225], dtype="float32")
-
-    return (x - mean) / std
-    """
