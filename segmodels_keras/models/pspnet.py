@@ -1,6 +1,7 @@
 from keras import backend, layers, models
 from keras import utils as keras_utils
 
+from .._compat import load_weights
 from ..backbones.backbones_factory import Backbones
 from ._common_blocks import Conv2dBn
 from ._utils import freeze_model
@@ -152,7 +153,7 @@ def build_psp(
     # load weights without top if path provided
     if weights_notop is not None:
         model_notop = models.Model(input_, x)
-        model_notop.load_weights(weights_notop)
+        load_weights(model_notop, weights_notop)
         if freeze_notop:
             freeze_model(model_notop)
         x = model_notop.output
@@ -276,6 +277,6 @@ def PSPNet(
 
     # loading model weights
     if weights is not None:
-        model.load_weights(weights)
+        load_weights(model, weights)
 
     return model

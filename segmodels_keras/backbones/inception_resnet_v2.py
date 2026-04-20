@@ -38,6 +38,8 @@ from keras import backend, layers, models
 from keras.applications import imagenet_utils
 from keras.utils import get_file, get_source_inputs
 
+from segmodels_keras._compat import load_weights
+
 from .resnet_common import _obtain_input_shape
 
 BASE_WEIGHT_URL = (
@@ -261,9 +263,9 @@ def InceptionResNetV2(
                 cache_subdir="models",
                 file_hash="d19885ff4a710c122648d3b5c3b684e4",
             )
-        model.load_weights(weights_path)
+        load_weights(model, weights_path)
     elif weights is not None:
-        model.load_weights(weights)
+        load_weights(model, weights)
 
     return model
 

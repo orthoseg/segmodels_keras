@@ -39,11 +39,16 @@ is based on it, but in addition the following tweaks have been applied:
 
 import os
 
+from segmodels_keras._compat import load_weights
+
 from keras import backend, layers, models
 from keras.applications import imagenet_utils
 from keras.utils import get_source_inputs
 
 from .resnet_common import _obtain_input_shape
+
+momentum = 0.99
+epsilon = 1.001e-5
 
 
 def ResNet(
@@ -141,7 +146,7 @@ def ResNet(
         # The batchnormalization parameters have been changed to be compatible with the
         # torchvision ResNet18/34 pretrained weights.
         x = layers.BatchNormalization(
-            axis=bn_axis, momentum=0.1, epsilon=1e-5, name="conv1_bn"
+            axis=bn_axis, momentum=momentum, epsilon=epsilon, name="conv1_bn"
         )(x)
         x = layers.Activation("relu", name="conv1_relu")(x)
 
@@ -154,7 +159,7 @@ def ResNet(
         # The batchnormalization parameters have been changed to be compatible with the
         # torchvision ResNet18/34 pretrained weights.
         x = layers.BatchNormalization(
-            axis=bn_axis, momentum=0.1, epsilon=1e-5, name="post_bn"
+            axis=bn_axis, momentum=momentum, epsilon=epsilon, name="post_bn"
         )(x)
         x = layers.Activation("relu", name="post_relu")(x)
 
@@ -184,7 +189,7 @@ def ResNet(
     model = models.Model(inputs, x, name=name)
 
     if weights is not None and os.path.exists(weights):
-        model.load_weights(weights)
+        load_weights(model, weights)
 
     return model
 
@@ -226,7 +231,7 @@ def residual_basicblock(
             filters, 1, strides=stride, use_bias=False, name=f"{name}_0_conv"
         )(x)
         shortcut = layers.BatchNormalization(
-            axis=bn_axis, momentum=0.1, epsilon=1e-5, name=f"{name}_0_bn"
+            axis=bn_axis, momentum=momentum, epsilon=epsilon, name=f"{name}_0_bn"
         )(shortcut)
     else:
         shortcut = x
@@ -236,14 +241,14 @@ def residual_basicblock(
         filters, kernel_size, strides=stride, use_bias=False, name=f"{name}_1_conv"
     )(x)
     x = layers.BatchNormalization(
-        axis=bn_axis, momentum=0.1, epsilon=1e-5, name=f"{name}_1_bn"
+        axis=bn_axis, momentum=momentum, epsilon=epsilon, name=f"{name}_1_bn"
     )(x)
     x = layers.Activation("relu", name=f"{name}_1_relu")(x)
 
     x = layers.ZeroPadding2D(padding=((1, 1), (1, 1)), name=f"{name}_2_pad")(x)
     x = layers.Conv2D(filters, kernel_size, use_bias=False, name=f"{name}_2_conv")(x)
     x = layers.BatchNormalization(
-        axis=bn_axis, momentum=0.1, epsilon=1e-5, name=f"{name}_2_bn"
+        axis=bn_axis, momentum=momentum, epsilon=epsilon, name=f"{name}_2_bn"
     )(x)
 
     x = layers.Add(name=f"{name}_add")([shortcut, x])
@@ -354,15 +359,32 @@ def ResNet34(
     )
 
 
-def preprocess_input(x, **kwargs):
-    """Torchvision-compatible ImageNet normalization (input in [0, 1])."""
-    import numpy as np
+def preprocess_input(x, data_format=None):
+    """Preprocesses a numpy array encoding a batch of images.
 
+    Args:
+        x: a 4D numpy array consists of RGB values within [0, 255].
+
+    Returns:
+        Preprocessed array.
+    """
+    return imagenet_utils.preprocess_input(x, data_format=data_format, mode="tf")
+
+    """
     # FLAIR-compatible normalization (input in [0, 255]).
     mean = np.array([105.08, 110.87, 101.82, 106.38, 53.26], dtype="float32")
     std = np.array([52.17, 45.38, 44, 39.69, 79.3], dtype="float32")
 
+    nb_channels = (
+        x.shape[-1] if backend.image_data_format() == "channels_last" else x.shape[1]
+    )
+    if nb_channels != len(mean):
+        mean = mean[:nb_channels]
+        std = std[:nb_channels]
+
     # Torchvision-compatible ImageNet normalization (input in [0, 1]).
     # mean = np.array([0.485, 0.456, 0.406], dtype="float32")
     # std = np.array([0.229, 0.224, 0.225], dtype="float32")
+
     return (x - mean) / std
+    """

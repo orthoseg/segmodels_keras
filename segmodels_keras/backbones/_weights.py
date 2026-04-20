@@ -3,6 +3,7 @@
 Source: https://github.com/qubvel/classification_models
 """
 
+from segmodels_keras._compat import load_weights
 from keras.utils import get_file
 
 __all__ = ["load_model_weights"]
@@ -35,7 +36,7 @@ def load_model_weights(model, model_name, dataset, classes, include_top):
             md5_hash=weights["md5"],
         )
 
-        model.load_weights(weights_path)
+        load_weights(model, weights_path)
 
     else:
         raise ValueError(

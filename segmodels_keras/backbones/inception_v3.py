@@ -14,6 +14,8 @@ from keras import backend, layers, models
 from keras import utils as keras_utils
 from keras.applications import imagenet_utils
 
+from segmodels_keras._compat import load_weights
+
 WEIGHTS_PATH = (
     "https://github.com/fchollet/deep-learning-models/"
     "releases/download/v0.5/"
@@ -361,9 +363,9 @@ def InceptionV3(
                 cache_subdir="models",
                 file_hash="bcbd6486424b2319ff4ef7d526e38f63",
             )
-        model.load_weights(weights_path)
+        load_weights(model, weights_path)
     elif weights is not None:
-        model.load_weights(weights)
+        load_weights(model, weights)
 
     return model
 
