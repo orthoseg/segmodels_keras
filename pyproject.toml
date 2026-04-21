@@ -1,3 +1,7 @@
+[[tool.mypy.overrides]]
+module = "six.*"
+ignore_missing_imports = true
+
 [tool.pyright]
 exclude = ["local_ignore", "**/node_modules", "**/__pycache__", "**/.*"]
 ignore = ["*"]

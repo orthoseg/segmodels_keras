@@ -4,6 +4,7 @@
 #   $ pip install twine
 
 import os
+from typing import Any
 
 from setuptools import find_packages, setup
 
@@ -40,7 +41,7 @@ except FileNotFoundError:
     long_description = DESCRIPTION
 
 # Load the package's _version.py module as a dictionary.
-about = {}
+about: dict[str, Any] = {}
 if not VERSION:
     with open(os.path.join(here, NAME, "_version.py")) as f:
         exec(f.read(), about)

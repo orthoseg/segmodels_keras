@@ -21,7 +21,7 @@ class KerasObject:
     @property
     def __name__(self) -> str:
         if self._name is None:
-            return self.__class__.__name__
+            return self.__class__.__name__  # type: ignore[return-value]
         return self._name
 
     @property
@@ -90,7 +90,7 @@ class Loss(KerasObject):
 
 
 class MultipliedLoss(Loss):
-    def __init__(self, loss: Loss, multiplier: int | float) -> None:
+    def __init__(self, loss: Any, multiplier: int | float) -> None:
 
         # resolve name
         if len(loss.__name__.split("+")) > 1:
@@ -106,7 +106,7 @@ class MultipliedLoss(Loss):
 
 
 class SumOfLosses(Loss):
-    def __init__(self, l1: Loss, l2: Loss) -> None:
+    def __init__(self, l1: Any, l2: Any) -> None:
         name = f"{l1.__name__}_plus_{l2.__name__}"
         super().__init__(name=name)
         self.l1 = l1

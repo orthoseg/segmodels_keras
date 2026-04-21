@@ -6,6 +6,7 @@ dependencies:
   - pip
   - keras =2.10
   # Dependencies needed for linting, tests,...
+  - mypy =1.20.1
   - numpy <2
   - pre-commit
   - pytest

@@ -49,8 +49,8 @@ def gather_channels(
         return xs
     elif isinstance(indexes, (int)):
         indexes = [indexes]
-    xs = [_gather_channels(x, indexes=indexes, **kwargs) for x in xs]
-    return tuple(xs)
+    xs = tuple(_gather_channels(x, indexes=indexes, **kwargs) for x in xs)
+    return xs
 
 
 def round_if_needed(x, threshold, **kwargs):
