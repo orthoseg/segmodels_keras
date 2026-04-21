@@ -28,7 +28,7 @@
  - Add support to freeze all layers except for the top layers (#24)
  - Use implementation + weights of keras.applications for inceptionresnetv2 and just
    retain the customizations needed for the skip connections (#13, #14)
- - Improve code consistency using ruff (#4)
+ - General code improvements by applying ruff, add type hints,... (#4, #30)
 
 ### segmentation_models
 
