@@ -1,4 +1,4 @@
-﻿"""ResNet18 and ResNet34 Keras models.
+"""ResNet18 and ResNet34 Keras models.
 
 Complements keras.applications (which provides ResNet50+) with BasicBlock-based
 ResNet18 and ResNet34. The implementation follows the keras.applications structure

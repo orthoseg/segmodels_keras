@@ -1,13 +1,14 @@
 """Utility functions for segmentation models"""
 
 from pathlib import Path
+from typing import Any
 
 from keras import models
 
 
 def save_model_weights_notop(
     model: models.Model, decoder: str, path: str | Path, overwrite: bool = True
-):
+) -> None:
     """Save model weights without top (without segmentation head).
 
     The weights saved like this can be used to preload a segmentation model for
@@ -23,7 +24,12 @@ def save_model_weights_notop(
             Defaults to ``True``.
 
     """
-    decoder_top_layers = {"fpn": 2, "linknet": 2, "unet": 2, "pspnet": 3}
+    decoder_top_layers: dict[str, int] = {
+        "fpn": 2,
+        "linknet": 2,
+        "unet": 2,
+        "pspnet": 3,
+    }
     if decoder not in decoder_top_layers:
         raise ValueError(
             f"Decoder should be one of {decoder_top_layers.keys()}, got {decoder}"
@@ -35,7 +41,7 @@ def save_model_weights_notop(
     model_notop.save_weights(str(path), overwrite=overwrite)
 
 
-def set_trainable(model, recompile=True, **kwargs):  # noqa: ARG001
+def set_trainable(model: models.Model, recompile: bool = True, **kwargs: Any) -> None:  # noqa: ARG001
     """Set all layers of model trainable and recompile it
 
     Note:
@@ -69,14 +75,14 @@ def set_trainable(model, recompile=True, **kwargs):  # noqa: ARG001
 
 
 def set_regularization(
-    model,
-    kernel_regularizer=None,
-    bias_regularizer=None,
-    activity_regularizer=None,
-    beta_regularizer=None,
-    gamma_regularizer=None,
-    **kwargs,  # noqa: ARG001
-):
+    model: models.Model,
+    kernel_regularizer: Any = None,
+    bias_regularizer: Any = None,
+    activity_regularizer: Any = None,
+    beta_regularizer: Any = None,
+    gamma_regularizer: Any = None,
+    **kwargs: dict[str, Any],  # noqa: ARG001
+) -> models.Model:
     """Set regularizers to all layers
 
     Note:

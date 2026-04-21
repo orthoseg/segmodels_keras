@@ -1,7 +1,9 @@
+from typing import Any
+
 from .base import Metric
 from .base import functional as F
 
-SMOOTH = 1e-5
+SMOOTH: float = 1e-5
 
 
 class IOUScore(Metric):
@@ -41,13 +43,13 @@ class IOUScore(Metric):
 
     def __init__(
         self,
-        class_weights=None,
-        class_indexes=None,
-        threshold=None,
-        per_image=False,
-        smooth=SMOOTH,
-        name=None,
-    ):
+        class_weights: Any = None,
+        class_indexes: Any = None,
+        threshold: int | float | None = None,
+        per_image: bool = False,
+        smooth: float = SMOOTH,
+        name: str | None = None,
+    ) -> None:
         name = name or "iou_score"
         super().__init__(name=name)
         self.class_weights = class_weights if class_weights is not None else 1
@@ -115,14 +117,14 @@ class FScore(Metric):
 
     def __init__(
         self,
-        beta=1,
-        class_weights=None,
-        class_indexes=None,
-        threshold=None,
-        per_image=False,
-        smooth=SMOOTH,
-        name=None,
-    ):
+        beta: int | float = 1,
+        class_weights: Any = None,
+        class_indexes: Any = None,
+        threshold: int | float | None = None,
+        per_image: bool = False,
+        smooth: float = SMOOTH,
+        name: str | None = None,
+    ) -> None:
         name = name or f"f{beta}-score"
         super().__init__(name=name)
         self.beta = beta
@@ -182,13 +184,13 @@ class Precision(Metric):
 
     def __init__(
         self,
-        class_weights=None,
-        class_indexes=None,
-        threshold=None,
-        per_image=False,
-        smooth=SMOOTH,
-        name=None,
-    ):
+        class_weights: Any = None,
+        class_indexes: Any = None,
+        threshold: int | float | None = None,
+        per_image: bool = False,
+        smooth: float = SMOOTH,
+        name: str | None = None,
+    ) -> None:
         name = name or "precision"
         super().__init__(name=name)
         self.class_weights = class_weights if class_weights is not None else 1
@@ -245,13 +247,13 @@ class Recall(Metric):
 
     def __init__(
         self,
-        class_weights=None,
-        class_indexes=None,
-        threshold=None,
-        per_image=False,
-        smooth=SMOOTH,
-        name=None,
-    ):
+        class_weights: Any = None,
+        class_indexes: Any = None,
+        threshold: int | float | None = None,
+        per_image: bool = False,
+        smooth: float = SMOOTH,
+        name: str | None = None,
+    ) -> None:
         name = name or "recall"
         super().__init__(name=name)
         self.class_weights = class_weights if class_weights is not None else 1
@@ -274,8 +276,8 @@ class Recall(Metric):
 
 
 # aliases
-iou_score = IOUScore()
-f1_score = FScore(beta=1)
-f2_score = FScore(beta=2)
-precision = Precision()
-recall = Recall()
+iou_score: IOUScore = IOUScore()
+f1_score: FScore = FScore(beta=1)
+f2_score: FScore = FScore(beta=2)
+precision: Precision = Precision()
+recall: Recall = Recall()

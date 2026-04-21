@@ -1,3 +1,5 @@
+from typing import Any
+
 import keras
 
 from segmodels_keras._compat import KERAS_GTE_3
@@ -7,7 +9,7 @@ if KERAS_GTE_3:
 else:
     from keras import backend as ops
 
-SMOOTH = 1e-5
+SMOOTH: float = 1e-5
 
 
 # ----------------------------------------------------------------
@@ -15,7 +17,7 @@ SMOOTH = 1e-5
 # ----------------------------------------------------------------
 
 
-def _gather_channels(x, indexes, **kwargs):
+def _gather_channels(x: Any, indexes: Any, **kwargs: Any) -> Any:
     backend = kwargs["backend"]
 
     """Slice tensor along channels axis by given indexes"""
@@ -30,7 +32,7 @@ def _gather_channels(x, indexes, **kwargs):
     return x
 
 
-def get_reduce_axes(per_image, **kwargs):
+def get_reduce_axes(per_image: bool, **kwargs: Any) -> list[int]:
     backend = kwargs["backend"]
 
     axes = [1, 2] if backend.image_data_format() == "channels_last" else [2, 3]
@@ -39,14 +41,16 @@ def get_reduce_axes(per_image, **kwargs):
     return axes
 
 
-def gather_channels(*xs, indexes=None, **kwargs):
+def gather_channels(
+    *xs: Any, indexes: int | list[int] | None = None, **kwargs: Any
+) -> tuple[Any, ...] | tuple[Any]:
     """Slice tensors along channels axis by given indexes"""
     if indexes is None:
         return xs
     elif isinstance(indexes, (int)):
         indexes = [indexes]
     xs = [_gather_channels(x, indexes=indexes, **kwargs) for x in xs]
-    return xs
+    return tuple(xs)
 
 
 def round_if_needed(x, threshold, **kwargs):

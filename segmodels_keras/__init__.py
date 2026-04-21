@@ -1,35 +1,37 @@
 import functools  # noqa: I001
 import os
+from typing import Any
+from collections.abc import Callable
 
 # __version__ should be defined as soon as possible
 from ._version import __version__
 
 from . import base
 
-_KERAS_FRAMEWORK_NAME = "keras"
-_TF_KERAS_FRAMEWORK_NAME = "tf.keras"
+_KERAS_FRAMEWORK_NAME: str = "keras"
+_TF_KERAS_FRAMEWORK_NAME: str = "tf.keras"
 
-_DEFAULT_KERAS_FRAMEWORK = _KERAS_FRAMEWORK_NAME
-_KERAS_FRAMEWORK = None
-_KERAS_BACKEND = None
-_KERAS_LAYERS = None
-_KERAS_MODELS = None
-_KERAS_UTILS = None
-_KERAS_LOSSES = None
+_DEFAULT_KERAS_FRAMEWORK: str = _KERAS_FRAMEWORK_NAME
+_KERAS_FRAMEWORK: str | None = None
+_KERAS_BACKEND: Any = None
+_KERAS_LAYERS: Any = None
+_KERAS_MODELS: Any = None
+_KERAS_UTILS: Any = None
+_KERAS_LOSSES: Any = None
 
 
-def inject_global_losses(func):
+def inject_global_losses(func: Callable[..., Any]) -> Callable[..., Any]:
     @functools.wraps(func)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args: Any, **kwargs: Any) -> Any:
         kwargs["losses"] = _KERAS_LOSSES
         return func(*args, **kwargs)
 
     return wrapper
 
 
-def filter_kwargs(func):
+def filter_kwargs(func: Callable[..., Any]) -> Callable[..., Any]:
     @functools.wraps(func)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args: Any, **kwargs: Any) -> Any:
         new_kwargs = {
             k: v
             for k, v in kwargs.items()
@@ -40,12 +42,12 @@ def filter_kwargs(func):
     return wrapper
 
 
-def framework():
+def framework() -> str | None:
     """Return name of Segmentation Models framework"""
     return _KERAS_FRAMEWORK
 
 
-def set_framework(name):
+def set_framework(name: str) -> None:
     """Set framework for Segmentation Models
 
     Args:
@@ -114,7 +116,7 @@ from .models.unet import Unet
 get_available_backbone_names = Backbones.models_names
 
 
-def get_preprocessing(name):
+def get_preprocessing(name: str) -> Callable[[Any], Any]:
     return Backbones.get_preprocessing(name)
 
 

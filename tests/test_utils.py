@@ -221,7 +221,7 @@ def test_load_keras_v3_style_weights_hdf5_duplicate_signatures(tmp_path):
 
     _load_keras_v3_weights_hdf5(model, path)
 
-    for layer, expected in zip(dense_layers, original_values):
+    for layer, expected in zip(dense_layers, original_values, strict=True):
         actual = layer.get_weights()[0]
         np.testing.assert_allclose(
             actual,

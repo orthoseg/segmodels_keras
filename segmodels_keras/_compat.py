@@ -1,5 +1,6 @@
 from collections import defaultdict
 from pathlib import Path
+from typing import Any
 
 import keras
 from packaging.version import parse as parse_version
@@ -7,7 +8,7 @@ from packaging.version import parse as parse_version
 KERAS_GTE_3 = parse_version(keras.__version__) >= parse_version("3.0.0")
 
 
-def _is_keras_v3_weights_hdf5(filepath):
+def _is_keras_v3_weights_hdf5(filepath: str | Path) -> bool:
     try:
         import h5py  # noqa: PLC0415
     except ImportError:
@@ -20,11 +21,11 @@ def _is_keras_v3_weights_hdf5(filepath):
         return False
 
 
-def _get_sorted_hdf5_var_keys(vars_group):
+def _get_sorted_hdf5_var_keys(vars_group: Any) -> list[int]:
     return sorted(vars_group.keys(), key=int)
 
 
-def _get_keras_v3_weighted_layers(handle):
+def _get_keras_v3_weighted_layers(handle: Any) -> list[dict[str, Any]]:
     import h5py  # noqa: PLC0415
 
     weighted_layers = []
@@ -51,12 +52,14 @@ def _get_keras_v3_weighted_layers(handle):
     return weighted_layers
 
 
-def _load_keras_v3_weights_hdf5(model, filepath):
+def _load_keras_v3_weights_hdf5(model: Any, filepath: str | Path) -> None:
     import h5py  # noqa: PLC0415
 
     with h5py.File(filepath, "r") as handle:
         saved_layers = _get_keras_v3_weighted_layers(handle)
-        saved_layers_by_signature = defaultdict(list)
+        saved_layers_by_signature: dict[tuple[Any, ...], list[dict[str, Any]]] = (
+            defaultdict(list)
+        )
         for saved_layer in saved_layers:
             saved_layers_by_signature[saved_layer["signature"]].append(saved_layer)
 
@@ -87,7 +90,7 @@ def _load_keras_v3_weights_hdf5(model, filepath):
         )
 
 
-def load_weights(model, filepath):
+def load_weights(model: Any, filepath: str | Path) -> None:
     """Load weights from an HDF5 file into a Keras model.
 
     TensorFlow/Keras 2.10 and 2.11 can only read the legacy HDF5 format

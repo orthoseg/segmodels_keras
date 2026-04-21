@@ -3,8 +3,9 @@
 Source: https://github.com/qubvel/classification_models
 """
 
-from segmodels_keras._compat import load_weights
 from keras.utils import get_file
+
+from segmodels_keras._compat import load_weights
 
 __all__ = ["load_model_weights"]
 

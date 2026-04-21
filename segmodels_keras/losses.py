@@ -1,7 +1,9 @@
+from typing import Any
+
 from .base import Loss
 from .base import functional as F
 
-SMOOTH = 1e-5
+SMOOTH: float = 1e-5
 
 
 class JaccardLoss(Loss):
@@ -32,8 +34,12 @@ class JaccardLoss(Loss):
     """
 
     def __init__(
-        self, class_weights=None, class_indexes=None, per_image=False, smooth=SMOOTH
-    ):
+        self,
+        class_weights: Any = None,
+        class_indexes: Any = None,
+        per_image: bool = False,
+        smooth: float = SMOOTH,
+    ) -> None:
         super().__init__(name="jaccard_loss")
         self.class_weights = class_weights if class_weights is not None else 1
         self.class_indexes = class_indexes
@@ -92,12 +98,12 @@ class DiceLoss(Loss):
 
     def __init__(
         self,
-        beta=1,
-        class_weights=None,
-        class_indexes=None,
-        per_image=False,
-        smooth=SMOOTH,
-    ):
+        beta: int | float = 1,
+        class_weights: Any = None,
+        class_indexes: Any = None,
+        per_image: bool = False,
+        smooth: float = SMOOTH,
+    ) -> None:
         super().__init__(name="dice_loss")
         self.beta = beta
         self.class_weights = class_weights if class_weights is not None else 1
@@ -137,7 +143,7 @@ class BinaryCELoss(Loss):
         model.compile('SGD', loss=loss)
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(name="binary_crossentropy")
 
     def __call__(self, gt, pr):
@@ -168,7 +174,7 @@ class CategoricalCELoss(Loss):
         model.compile('SGD', loss=loss)
     """
 
-    def __init__(self, class_weights=None, class_indexes=None):
+    def __init__(self, class_weights: Any = None, class_indexes: Any = None) -> None:
         super().__init__(name="categorical_crossentropy")
         self.class_weights = class_weights if class_weights is not None else 1
         self.class_indexes = class_indexes
@@ -209,7 +215,9 @@ class CategoricalFocalLoss(Loss):
             model.compile('SGD', loss=loss)
     """
 
-    def __init__(self, alpha=0.25, gamma=2.0, class_indexes=None):
+    def __init__(
+        self, alpha: float = 0.25, gamma: float = 2.0, class_indexes: Any = None
+    ) -> None:
         super().__init__(name="focal_loss")
         self.alpha = alpha
         self.gamma = gamma
@@ -250,7 +258,7 @@ class BinaryFocalLoss(Loss):
         model.compile('SGD', loss=loss)
     """  # noqa: E501
 
-    def __init__(self, alpha=0.25, gamma=2.0):
+    def __init__(self, alpha: float = 0.25, gamma: float = 2.0) -> None:
         super().__init__(name="binary_focal_loss")
         self.alpha = alpha
         self.gamma = gamma
@@ -262,14 +270,14 @@ class BinaryFocalLoss(Loss):
 
 
 # aliases
-jaccard_loss = JaccardLoss()
-dice_loss = DiceLoss()
+jaccard_loss: JaccardLoss = JaccardLoss()
+dice_loss: DiceLoss = DiceLoss()
 
-binary_focal_loss = BinaryFocalLoss()
-categorical_focal_loss = CategoricalFocalLoss()
+binary_focal_loss: BinaryFocalLoss = BinaryFocalLoss()
+categorical_focal_loss: CategoricalFocalLoss = CategoricalFocalLoss()
 
-binary_crossentropy = BinaryCELoss()
-categorical_crossentropy = CategoricalCELoss()
+binary_crossentropy: BinaryCELoss = BinaryCELoss()
+categorical_crossentropy: CategoricalCELoss = CategoricalCELoss()
 
 # loss combinations
 bce_dice_loss = binary_crossentropy + dice_loss

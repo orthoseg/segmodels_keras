@@ -24,14 +24,14 @@ class BackbonesFactory:
             resnet_18_34.ResNet18,
             resnet_18_34.preprocess_input,
             # resnet18: layer1=2, layer2=2, layer3=2, layer4=2 blocks
-            # backbone output = conv5_block2_out (512ch); skips are the 4 stages before it
+            # backbone output = conv5_block2_out (512ch); skips are the 4 stages before
             ("conv4_block2_out", "conv3_block2_out", "conv2_block2_out", "conv1_relu"),
         ),
         "resnet34": (
             resnet_18_34.ResNet34,
             resnet_18_34.preprocess_input,
             # resnet34: layer1=3, layer2=4, layer3=6, layer4=3 blocks
-            # backbone output = conv5_block3_out (512ch); skips are the 4 stages before it
+            # backbone output = conv5_block3_out (512ch); skips are the 4 stages before
             ("conv4_block6_out", "conv3_block4_out", "conv2_block3_out", "conv1_relu"),
         ),
         # ResNets > 50 layers are available via keras.applications, so use those.
