@@ -86,5 +86,11 @@ def test_model(model_name, backbone_name, input_shape, encoder_weights):
     assert x.shape[:-1] == y.shape[:-1]
 
 
+def test_get_model_invalid_name():
+    """Test get_model with invalid model name."""
+    with pytest.raises(ValueError, match="Unknown model name: invalid_model"):
+        get_model("invalid_model")
+
+
 if __name__ == "__main__":
     pytest.main([__file__])

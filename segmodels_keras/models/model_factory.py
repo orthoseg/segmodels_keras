@@ -4,9 +4,11 @@ from typing import Literal
 
 from . import fpn, linknet, pspnet, unet
 
+ModelNames = Literal["unet", "linknet", "pspnet", "fpn"]
+
 
 def get_model(
-    model_name: Literal["unet", "linknet", "pspnet", "fpn"],
+    model_name: ModelNames,
     backbone_name: str = "vgg16",
     input_shape: tuple[int | None, int | None, int] = (None, None, 3),
     classes: int = 1,
@@ -90,5 +92,5 @@ def get_model(
     else:
         raise ValueError(
             f"Unknown model name: {model_name}. "
-            f"Supported models are: 'unet', 'linknet', 'pspnet', 'fpn'"
+            f"Supported models are: {', '.join(ModelNames.__args__)}"
         )
