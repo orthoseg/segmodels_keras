@@ -110,6 +110,7 @@ from . import losses, metrics, utils
 from .backbones.backbones_factory import Backbones
 from .models.fpn import FPN
 from .models.linknet import Linknet
+from .models.model_factory import get_model
 from .models.pspnet import PSPNet
 from .models.unet import Unet
 
@@ -128,6 +129,7 @@ __all__ = [
     "__version__",
     "framework",
     "get_available_backbone_names",
+    "get_model",
     "get_preprocessing",
     "losses",
     "metrics",

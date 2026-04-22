@@ -5,7 +5,7 @@ import pytest
 import six
 
 import segmodels_keras as sm
-from segmodels_keras import FPN, Linknet, PSPNet, Unet, get_available_backbone_names
+from segmodels_keras import get_available_backbone_names, get_model
 
 if sm.framework() == sm._TF_KERAS_FRAMEWORK_NAME:
     from tensorflow import keras
@@ -19,14 +19,7 @@ def str2bool(v):
     return v.lower() in ("yes", "true", "t", "1")
 
 
-def get_backbones():
-    return get_available_backbone_names()
-
-
-BACKBONES = get_backbones()
-
-
-def _test_backbones(names):
+def get_test_backbones():
     is_full = str2bool(os.environ.get("FULL_TEST", "False"))
     if not is_full:
         return [
@@ -37,7 +30,7 @@ def _test_backbones(names):
             "efficientnetv2m",
         ]
     else:
-        return names
+        return get_available_backbone_names()
 
 
 def keras_test(func):
@@ -57,71 +50,46 @@ def keras_test(func):
     return wrapper
 
 
+@pytest.mark.parametrize("backbone_name", get_test_backbones())
+@pytest.mark.parametrize(
+    "model_name, input_shape, encoder_weights",
+    [
+        ("unet", None, None),
+        ("unet", None, "imagenet"),
+        ("unet", (256, 256, 4), None),
+        ("linknet", None, None),
+        ("linknet", (256, 256, 4), None),
+        ("pspnet", (384, 384, 4), None),
+        ("fpn", None, None),
+        ("fpn", (256, 256, 4), None),
+    ],
+)
 @keras_test
-def _test_none_shape(model_fn, backbone, *args, **kwargs):
+def test_model(model_name, backbone_name, input_shape, encoder_weights):
+    """Test all segmentation models with different backbones.
 
-    # define number of channels
-    input_shape = kwargs.get("input_shape", None)
+    input_shape=None means any shape (32x32 used in test), otherwise a fixed shape is
+    used.
+    """
     n_channels = 3 if input_shape is None else input_shape[-1]
+    test_shape = (1, 32, 32, n_channels) if input_shape is None else (1, *input_shape)
 
-    # create test sample
-    x = np.ones((1, 32, 32, n_channels))
-
-    # define model and process sample
-    model = model_fn(backbone, *args, **kwargs)
+    x = np.ones(test_shape)
+    model = get_model(
+        model_name,
+        backbone_name=backbone_name,
+        input_shape=input_shape or (None, None, n_channels),
+        encoder_weights=encoder_weights,
+    )
     y = model.predict(x)
 
-    # check output dimensions
     assert x.shape[:-1] == y.shape[:-1]
 
 
-@keras_test
-def _test_shape(model_fn, backbone, input_shape, *args, **kwargs):
-
-    # create test sample
-    x = np.ones((1, *input_shape))
-
-    # define model and process sample
-    model = model_fn(backbone, input_shape=input_shape, *args, **kwargs)  # noqa: B026
-    y = model.predict(x)
-
-    # check output dimensions
-    assert x.shape[:-1] == y.shape[:-1]
-
-
-@pytest.mark.parametrize("backbone", _test_backbones(BACKBONES))
-def test_unet(backbone):
-    _test_none_shape(Unet, backbone, encoder_weights=None)
-
-    _test_none_shape(Unet, backbone, encoder_weights="imagenet")
-
-    _test_shape(Unet, backbone, input_shape=(256, 256, 4), encoder_weights=None)
-
-
-@pytest.mark.parametrize("backbone", _test_backbones(BACKBONES))
-def test_linknet(backbone):
-    _test_none_shape(Linknet, backbone, encoder_weights=None)
-
-    _test_none_shape(Linknet, backbone, encoder_weights="imagenet")
-
-    _test_shape(Linknet, backbone, input_shape=(256, 256, 4), encoder_weights=None)
-
-
-@pytest.mark.parametrize("backbone", _test_backbones(BACKBONES))
-def test_pspnet(backbone):
-
-    _test_shape(PSPNet, backbone, input_shape=(384, 384, 4), encoder_weights=None)
-
-    _test_shape(PSPNet, backbone, input_shape=(384, 384, 3), encoder_weights="imagenet")
-
-
-@pytest.mark.parametrize("backbone", _test_backbones(BACKBONES))
-def test_fpn(backbone):
-    _test_none_shape(FPN, backbone, encoder_weights=None)
-
-    _test_none_shape(FPN, backbone, encoder_weights="imagenet")
-
-    _test_shape(FPN, backbone, input_shape=(256, 256, 4), encoder_weights=None)
+def test_get_model_invalid_name():
+    """Test get_model with invalid model name."""
+    with pytest.raises(ValueError, match="Unknown model name: invalid_model"):
+        get_model("invalid_model")
 
 
 if __name__ == "__main__":
