@@ -26,6 +26,8 @@
  - Add support for keras v3 (#5)
  - Add support to provide weights without top when creating a model (#19)
  - Add support to freeze all layers except for the top layers (#24)
+ - Add `utils.load_weights` that also supports loading weights that were saved to .h in
+   keras 3 in keras <= 2.11 (#28, #31).
  - Use implementation + weights of keras.applications for inceptionresnetv2 and just
    retain the customizations needed for the skip connections (#13, #14)
  - General code improvements by applying ruff, add type hints,... (#4, #30)
