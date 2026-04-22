@@ -4,8 +4,7 @@ import pytest
 
 import segmodels_keras as sm
 from segmodels_keras import Unet
-from segmodels_keras._compat import _load_keras_v3_weights_hdf5
-from segmodels_keras.utils import set_regularization
+from segmodels_keras.utils import _load_keras_v3_weights_hdf5, set_regularization
 
 if sm.framework() == sm._TF_KERAS_FRAMEWORK_NAME:
     from tensorflow import keras

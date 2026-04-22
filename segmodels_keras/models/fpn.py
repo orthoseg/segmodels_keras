@@ -1,8 +1,8 @@
 from keras import backend, layers, models
 from keras import utils as keras_utils
 
-from .._compat import load_weights
 from ..backbones.backbones_factory import Backbones
+from ..utils import load_weights
 from ._common_blocks import Conv2dBn
 from ._utils import freeze_model
 

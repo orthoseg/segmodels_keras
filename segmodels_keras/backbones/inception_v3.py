@@ -14,7 +14,7 @@ from keras import backend, layers, models
 from keras import utils as keras_utils
 from keras.applications import imagenet_utils
 
-from segmodels_keras._compat import load_weights
+from ..utils import load_weights
 
 WEIGHTS_PATH = (
     "https://github.com/fchollet/deep-learning-models/"
