@@ -1,5 +1,5 @@
 [[tool.mypy.overrides]]
-module = "six.*"
+module = "h5py.*,keras.*,six.*,setuptools.*,sphinx_rtd_theme.*,tensorflow.*"
 ignore_missing_imports = true
 
 [tool.pyright]

@@ -38,8 +38,7 @@ from keras import backend, layers, models
 from keras.applications import imagenet_utils
 from keras.utils import get_source_inputs
 
-from segmodels_keras._compat import load_weights
-
+from ..utils import load_weights
 from .resnet_common import _obtain_input_shape
 
 momentum = 0.99
