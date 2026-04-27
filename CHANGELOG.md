@@ -28,7 +28,7 @@
  - Add support to freeze all layers except for the top layers (#24)
  - Add a model factory function `get_model` to create a model by `model_name` (#32)
  - Add `utils.load_weights` that also supports loading weights that were saved to .h in
-   keras 3 in keras <= 2.11 (#28, #31).
+   keras 3 in keras <= 2.11 and the other way around (#28, #31, #33).
  - Use implementation + weights of keras.applications for inceptionresnetv2 and just
    retain the customizations needed for the skip connections (#13, #14)
  - General code improvements by applying ruff, add type hints,... (#4, #30)
