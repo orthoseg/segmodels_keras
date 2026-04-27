@@ -6,6 +6,7 @@ import six
 
 import segmodels_keras as sm
 from segmodels_keras import get_available_backbone_names, get_model
+from tests.test_helper import data_dir
 
 if sm.framework() == sm._TF_KERAS_FRAMEWORK_NAME:
     from tensorflow import keras
@@ -65,7 +66,7 @@ def keras_test(func):
     ],
 )
 @keras_test
-def test_model(model_name, backbone_name, input_shape, encoder_weights):
+def test_get_model(model_name, backbone_name, input_shape, encoder_weights):
     """Test all segmentation models with different backbones.
 
     input_shape=None means any shape (32x32 used in test), otherwise a fixed shape is
@@ -90,6 +91,24 @@ def test_get_model_invalid_name():
     """Test get_model with invalid model name."""
     with pytest.raises(ValueError, match="Unknown model name: invalid_model"):
         get_model("invalid_model")
+
+
+def test_get_model_weights_notop_keras2():
+    """Test loading a Keras v2 style HDF5 weight file."""
+    weights_path = data_dir / "mobilenetv2+linknet_notop_k2.weights.h5"
+    model = sm.Linknet("mobilenetv2", weights_notop=weights_path, encoder_weights=None)
+
+    assert model is not None
+    assert len(model.layers) > 0
+
+
+def test_get_model_weights_notop_keras3():
+    """Test loading a Keras v3 style HDF5 weight file."""
+    weights_path = data_dir / "mobilenetv2+linknet_notop_k3.weights.h5"
+    model = sm.Linknet("mobilenetv2", weights_notop=weights_path, encoder_weights=None)
+
+    assert model is not None
+    assert len(model.layers) > 0
 
 
 if __name__ == "__main__":

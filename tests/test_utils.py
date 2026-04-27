@@ -110,16 +110,11 @@ def test_activity_reg(case):
 @pytest.mark.parametrize("decoder", ["fpn", "linknet", "unet", "pspnet"])
 def test_save_model_weights_notop(tmp_path, decoder):
     backbone_name = "mobilenetv2"
-    if decoder == "pspnet":
-        model = sm.PSPNet(backbone_name, encoder_weights=None)
-    elif decoder == "fpn":
-        model = sm.FPN(backbone_name, encoder_weights=None)
-    elif decoder == "linknet":
-        model = sm.Linknet(backbone_name, encoder_weights=None)
-    elif decoder == "unet":
-        model = sm.Unet(backbone_name, encoder_weights=None)
-    else:
-        raise ValueError(f"Incorrect decoder {decoder}")
+    model = sm.get_model(
+        model_name=decoder,
+        backbone_name=backbone_name,
+        encoder_weights=None,
+    )
 
     # Test saving the model weights without the top layers
     path = tmp_path / f"{decoder}.weights.h5"
@@ -127,16 +122,12 @@ def test_save_model_weights_notop(tmp_path, decoder):
 
     # Test loading the model weights without the top layers again
     assert path.exists()
-    if decoder == "pspnet":
-        model = sm.PSPNet(backbone_name, weights_notop=path, freeze_notop=True)
-    elif decoder == "fpn":
-        model = sm.FPN(backbone_name, weights_notop=path, freeze_notop=True)
-    elif decoder == "linknet":
-        model = sm.Linknet(backbone_name, weights_notop=path, freeze_notop=True)
-    elif decoder == "unet":
-        model = sm.Unet(backbone_name, weights_notop=path, freeze_notop=True)
-    else:
-        raise ValueError(f"Incorrect decoder {decoder}")
+    model = sm.get_model(
+        model_name=decoder,
+        backbone_name=backbone_name,
+        weights_notop=path,
+        freeze_notop=True,
+    )
 
 
 def test_save_model_weights_notop_invalid_decoder():
