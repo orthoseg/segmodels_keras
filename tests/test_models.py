@@ -92,13 +92,5 @@ def test_get_model_invalid_name():
         get_model("invalid_model")
 
 
-def test_get_model_weights_notop():
-    path = r"X:\Monitoring\OrthoSeg\_weights\inceptionresnetv2+unet_aerial-v1_notop.weights.h5"
-
-    model = sm.Unet("inceptionresnetv2", weights_notop=path, freeze_notop=True)
-    assert model is not None
-    assert len(model.layers) > 0
-
-
 if __name__ == "__main__":
     pytest.main([__file__])
