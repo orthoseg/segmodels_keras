@@ -16,15 +16,21 @@ def load_weights(model: Any, filepath: str | Path) -> None:
     TensorFlow/Keras 2.10 and 2.11 can only read the legacy HDF5 format
     (``layer_names`` attribute at the root).  Keras 3 switched to a newer
     layout where weights are stored under ``layers/<name>/vars/<index>``.
+
     When a file saved with Keras 3 is opened by the TF 2.10/2.11 loader the
     error "found 0 saved layers" is raised because the legacy reader finds no
     ``layer_names`` attribute.
 
-    This wrapper calls ``model.load_weights`` first.  If that raises the
-    "found 0 saved layers" ValueError *and* the file is detected as a Keras 3
-    weights HDF5 file, it falls back to a manual reader that matches each
-    model layer to its saved counterpart by weight-shape signature and file
-    creation order.
+    When a file saved with Keras 2 is opened by Keras 3, the error about
+    "expected X variables, but received 0 variables" is raised because Keras 3
+    cannot read the legacy format directly.
+
+    This wrapper calls ``model.load_weights`` first. If that raises a ValueError:
+    - If it's a Keras 3 weights file loaded in Keras 2, it uses a custom reader
+      that matches each model layer to its saved counterpart by weight-shape
+      signature and file creation order.
+    - If it's a Keras 2 weights file loaded in Keras 3, it delegates to Keras'
+      legacy HDF5 format loader.
 
     Args:
         model: Keras model whose weights should be restored.
@@ -36,17 +42,36 @@ def load_weights(model: Any, filepath: str | Path) -> None:
         filepath = str(filepath)
         message = str(ex)
         is_hdf5 = Path(filepath).suffix in {".h5", ".hdf5"}
-        if (
-            not is_hdf5
-            or "found 0 saved layers" not in message
-            or not _is_keras_v3_weights_hdf5(filepath)
-        ):
+
+        if not is_hdf5:
             raise
 
-        _load_keras_v3_weights_hdf5(model, filepath)
+        # Try to handle Keras 3 weights in Keras 2
+        if "found 0 saved layers" in message and _is_keras_v3_weights_hdf5(filepath):
+            _load_keras_v3_weights_hdf5(model, filepath)
+            return
+
+        # Try to handle Keras 2 weights in Keras 3
+        if (
+            "expected" in message
+            and "variables" in message
+            and "received 0" in message
+            and _is_keras_v2_weights_hdf5(filepath)
+        ):
+            _load_keras_v2_weights_hdf5(model, filepath)
+            return
+
+        # If none of the above, re-raise the original error
+        raise
 
 
 def _is_keras_v3_weights_hdf5(filepath: str | Path) -> bool:
+    """Check if the HDF5 file is in Keras 3 format.
+
+    Keras 3 HDF5 weight files have a "layers" group with subgroups for each layer,
+    and each layer subgroup contains a "vars" group with datasets for each weight
+    variable.
+    """
     try:
         import h5py  # noqa: PLC0415
     except ImportError:
@@ -55,6 +80,24 @@ def _is_keras_v3_weights_hdf5(filepath: str | Path) -> bool:
     try:
         with h5py.File(filepath, "r") as handle:
             return "layers" in handle and "vars" in handle
+    except OSError:
+        return False
+
+
+def _is_keras_v2_weights_hdf5(filepath: str | Path) -> bool:
+    """Check if the HDF5 file is in Keras 2 format.
+
+    Keras 2 HDF5 weight files have a "layer_names" attribute at the root.
+    """
+    try:
+        import h5py  # noqa: PLC0415
+    except ImportError:
+        return False
+
+    try:
+        with h5py.File(filepath, "r") as handle:
+            # Keras 2 format has layer_names attribute at the root
+            return "layer_names" in handle.attrs
     except OSError:
         return False
 
@@ -126,6 +169,29 @@ def _load_keras_v3_weights_hdf5(model: Any, filepath: str | Path) -> None:
             "No matching weighted layers found in Keras v3 HDF5 weights file: "
             f"{filepath}"
         )
+
+
+def _load_keras_v2_weights_hdf5(model: Any, filepath: str | Path) -> None:
+    """Load legacy Keras 2 HDF5 weights into a Keras 3 model.
+
+    Uses Keras' built-in legacy HDF5 loader to restore weights from files
+    saved with Keras 2, which store weights under ``layer_names`` groups
+    rather than the modern ``layers/<name>/vars`` structure.
+    """
+    import h5py  # noqa: PLC0415
+    from keras.src.legacy.saving import legacy_h5_format  # noqa: PLC0415
+
+    with h5py.File(filepath, "r") as handle:
+        if "layer_names" not in handle.attrs and "model_weights" in handle:
+            handle = handle["model_weights"]
+
+        if "layer_names" not in handle.attrs:
+            raise ValueError(
+                f"HDF5 file {filepath} does not appear to be in Keras 2 format "
+                "(missing layer_names attribute)"
+            )
+
+        legacy_h5_format.load_weights_from_hdf5_group(handle, model)
 
 
 def save_model_weights_notop(
