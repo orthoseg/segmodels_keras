@@ -1,3 +1,5 @@
+from typing import Any
+
 from keras import backend, layers, models
 from keras import utils as keras_utils
 
@@ -11,7 +13,7 @@ from ._utils import freeze_model
 # ---------------------------------------------------------------------
 
 
-def get_submodules():
+def get_submodules() -> dict[str, Any]:
     return {
         "backend": backend,
         "models": models,
@@ -25,7 +27,11 @@ def get_submodules():
 # ---------------------------------------------------------------------
 
 
-def Conv3x3BnReLU(filters, use_batchnorm, name=None):
+def Conv3x3BnReLU(
+    filters: int,
+    use_batchnorm: bool,
+    name: str | None = None,
+) -> Any:
     kwargs = get_submodules()
 
     def wrapper(input_tensor):
@@ -43,7 +49,11 @@ def Conv3x3BnReLU(filters, use_batchnorm, name=None):
     return wrapper
 
 
-def Conv1x1BnReLU(filters, use_batchnorm, name=None):
+def Conv1x1BnReLU(
+    filters: int,
+    use_batchnorm: bool,
+    name: str | None = None,
+) -> Any:
     kwargs = get_submodules()
 
     def wrapper(input_tensor):
@@ -61,7 +71,11 @@ def Conv1x1BnReLU(filters, use_batchnorm, name=None):
     return wrapper
 
 
-def DecoderUpsamplingX2Block(filters, stage, use_batchnorm):
+def DecoderUpsamplingX2Block(
+    filters: int | None,
+    stage: int,
+    use_batchnorm: bool,
+) -> Any:
     conv_block1_name = f"decoder_stage{stage}a"
     conv_block2_name = f"decoder_stage{stage}b"
     conv_block3_name = f"decoder_stage{stage}c"
@@ -88,7 +102,11 @@ def DecoderUpsamplingX2Block(filters, stage, use_batchnorm):
     return wrapper
 
 
-def DecoderTransposeX2Block(filters, stage, use_batchnorm):
+def DecoderTransposeX2Block(
+    filters: int | None,
+    stage: int,
+    use_batchnorm: bool,
+) -> Any:
     conv_block1_name = f"decoder_stage{stage}a"
     transpose_name = f"decoder_stage{stage}b_transpose"
     bn_name = f"decoder_stage{stage}b_bn"
@@ -134,17 +152,17 @@ def DecoderTransposeX2Block(filters, stage, use_batchnorm):
 
 
 def build_linknet(
-    backbone,
-    decoder_block,
-    skip_connection_layers,
-    decoder_filters=(256, 128, 64, 32, 16),
-    n_upsample_blocks=5,
-    classes=1,
-    activation="sigmoid",
-    use_batchnorm=True,
-    weights_notop=None,
-    freeze_notop=False,
-):
+    backbone: models.Model,
+    decoder_block: Any,
+    skip_connection_layers: list[int | str],
+    decoder_filters: tuple[int | None, ...] = (256, 128, 64, 32, 16),
+    n_upsample_blocks: int = 5,
+    classes: int = 1,
+    activation: str = "sigmoid",
+    use_batchnorm: bool = True,
+    weights_notop: str | None = None,
+    freeze_notop: bool = False,
+) -> models.Model:
     input_ = backbone.input
     x = backbone.output
 
@@ -202,21 +220,21 @@ def build_linknet(
 
 
 def Linknet(
-    backbone_name="vgg16",
-    input_shape=(None, None, 3),
-    classes=1,
-    activation="sigmoid",
-    weights=None,
-    weights_notop=None,
-    freeze_notop=False,
-    encoder_weights="imagenet",
-    encoder_freeze=False,
-    encoder_features="default",
-    decoder_block_type="upsampling",
-    decoder_filters=(None, None, None, None, 16),
-    decoder_use_batchnorm=True,
+    backbone_name: str = "vgg16",
+    input_shape: tuple[int | None, int | None, int] = (None, None, 3),
+    classes: int = 1,
+    activation: str = "sigmoid",
+    weights: str | None = None,
+    weights_notop: str | None = None,
+    freeze_notop: bool = False,
+    encoder_weights: str | None = "imagenet",
+    encoder_freeze: bool = False,
+    encoder_features: str | list[int | str] = "default",
+    decoder_block_type: str = "upsampling",
+    decoder_filters: tuple[int | None, ...] = (None, None, None, None, 16),
+    decoder_use_batchnorm: bool = True,
     **kwargs,
-):
+) -> models.Model:
     """Linknet_ is a fully convolution neural network for fast semantic segmentation.
 
     Note:
@@ -280,12 +298,14 @@ def Linknet(
     )
 
     if encoder_features == "default":
-        encoder_features = Backbones.get_feature_layers(backbone_name, n=4)
+        skip_connection_layers = Backbones.get_feature_layers(backbone_name, n=4)
+    else:
+        skip_connection_layers = encoder_features
 
     model = build_linknet(
         backbone=backbone,
         decoder_block=decoder_block,
-        skip_connection_layers=encoder_features,
+        skip_connection_layers=skip_connection_layers,
         decoder_filters=decoder_filters,
         classes=classes,
         activation=activation,

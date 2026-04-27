@@ -1,3 +1,5 @@
+from typing import Any
+
 from keras import backend, layers, models
 from keras import utils as keras_utils
 
@@ -11,7 +13,7 @@ from ._utils import freeze_model
 # ---------------------------------------------------------------------
 
 
-def get_submodules():
+def get_submodules() -> dict[str, Any]:
     return {
         "backend": backend,
         "models": models,
@@ -20,7 +22,10 @@ def get_submodules():
     }
 
 
-def check_input_shape(input_shape, factor):
+def check_input_shape(
+    input_shape: tuple[int, int, int] | tuple[int | None, int | None, int],
+    factor: int,
+) -> None:
     if input_shape is None:
         raise ValueError("Input shape should be a tuple of 3 integers, not None!")
 
@@ -29,6 +34,12 @@ def check_input_shape(input_shape, factor):
         if backend.image_data_format() == "channels_last"
         else input_shape[1:]
     )
+    if h is None or w is None:
+        raise ValueError(
+            "Input shape should define spatial dimensions for PSPNet, "
+            f"got {input_shape}!"
+        )
+
     min_size = factor * 6
 
     is_wrong_shape = (
@@ -47,7 +58,11 @@ def check_input_shape(input_shape, factor):
 # ---------------------------------------------------------------------
 
 
-def Conv1x1BnReLU(filters, use_batchnorm, name=None):
+def Conv1x1BnReLU(
+    filters: int,
+    use_batchnorm: bool,
+    name: str | None = None,
+) -> Any:
     kwargs = get_submodules()
 
     def wrapper(input_tensor):
@@ -66,11 +81,11 @@ def Conv1x1BnReLU(filters, use_batchnorm, name=None):
 
 
 def SpatialContextBlock(
-    level,
-    conv_filters=512,
-    pooling_type="avg",
-    use_batchnorm=True,
-):
+    level: int,
+    conv_filters: int = 512,
+    pooling_type: str = "avg",
+    use_batchnorm: bool = True,
+) -> Any:
     if pooling_type not in ("max", "avg"):
         raise ValueError(
             f"Unsupported pooling type - `{pooling_type}`.Use `avg` or `max`."
@@ -116,18 +131,18 @@ def SpatialContextBlock(
 
 
 def build_psp(
-    backbone,
-    psp_layer_idx,
-    pooling_type="avg",
-    conv_filters=512,
-    use_batchnorm=True,
-    final_upsampling_factor=8,
-    classes=21,
-    activation="softmax",
-    dropout=None,
-    weights_notop=None,
-    freeze_notop=False,
-):
+    backbone: models.Model,
+    psp_layer_idx: int | str,
+    pooling_type: str = "avg",
+    conv_filters: int = 512,
+    use_batchnorm: bool = True,
+    final_upsampling_factor: int = 8,
+    classes: int = 21,
+    activation: str = "softmax",
+    dropout: float | None = None,
+    weights_notop: str | None = None,
+    freeze_notop: bool = False,
+) -> models.Model:
     input_ = backbone.input
     x = (
         backbone.get_layer(name=psp_layer_idx).output
@@ -183,22 +198,22 @@ def build_psp(
 
 
 def PSPNet(
-    backbone_name="vgg16",
-    input_shape=(384, 384, 3),
-    classes=21,
-    activation="softmax",
-    weights=None,
-    weights_notop=None,
-    freeze_notop=False,
-    encoder_weights="imagenet",
-    encoder_freeze=False,
-    downsample_factor=8,
-    psp_conv_filters=512,
-    psp_pooling_type="avg",
-    psp_use_batchnorm=True,
-    psp_dropout=None,
+    backbone_name: str = "vgg16",
+    input_shape: tuple[int, int, int] = (384, 384, 3),
+    classes: int = 21,
+    activation: str = "softmax",
+    weights: str | None = None,
+    weights_notop: str | None = None,
+    freeze_notop: bool = False,
+    encoder_weights: str | None = "imagenet",
+    encoder_freeze: bool = False,
+    downsample_factor: int = 8,
+    psp_conv_filters: int = 512,
+    psp_pooling_type: str = "avg",
+    psp_use_batchnorm: bool = True,
+    psp_dropout: float | None = None,
     **kwargs,
-):
+) -> models.Model:
     """PSPNet_ is a fully convolution neural network for image semantic segmentation
 
     Args:

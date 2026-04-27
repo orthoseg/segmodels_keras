@@ -1,3 +1,5 @@
+from typing import Any
+
 from keras import backend, layers, models
 from keras import utils as keras_utils
 
@@ -11,7 +13,7 @@ from ._utils import freeze_model
 # ---------------------------------------------------------------------
 
 
-def get_submodules():
+def get_submodules() -> dict[str, Any]:
     return {
         "backend": backend,
         "models": models,
@@ -25,7 +27,11 @@ def get_submodules():
 # ---------------------------------------------------------------------
 
 
-def Conv3x3BnReLU(filters, use_batchnorm, name=None):
+def Conv3x3BnReLU(
+    filters: int,
+    use_batchnorm: bool,
+    name: str | None = None,
+) -> Any:
     kwargs = get_submodules()
 
     def wrapper(input_tensor):
@@ -43,7 +49,11 @@ def Conv3x3BnReLU(filters, use_batchnorm, name=None):
     return wrapper
 
 
-def DecoderUpsamplingX2Block(filters, stage, use_batchnorm=False):
+def DecoderUpsamplingX2Block(
+    filters: int,
+    stage: int,
+    use_batchnorm: bool = False,
+) -> Any:
     up_name = f"decoder_stage{stage}_upsampling"
     conv1_name = f"decoder_stage{stage}a"
     conv2_name = f"decoder_stage{stage}b"
@@ -65,7 +75,11 @@ def DecoderUpsamplingX2Block(filters, stage, use_batchnorm=False):
     return wrapper
 
 
-def DecoderTransposeX2Block(filters, stage, use_batchnorm=False):
+def DecoderTransposeX2Block(
+    filters: int,
+    stage: int,
+    use_batchnorm: bool = False,
+) -> Any:
     transp_name = f"decoder_stage{stage}a_transpose"
     bn_name = f"decoder_stage{stage}a_bn"
     relu_name = f"decoder_stage{stage}a_relu"
@@ -106,17 +120,17 @@ def DecoderTransposeX2Block(filters, stage, use_batchnorm=False):
 
 
 def build_unet(
-    backbone,
-    decoder_block,
-    skip_connection_layers,
-    decoder_filters=(256, 128, 64, 32, 16),
-    n_upsample_blocks=5,
-    classes=1,
-    activation="sigmoid",
-    use_batchnorm=True,
-    weights_notop=None,
-    freeze_notop=False,
-):
+    backbone: models.Model,
+    decoder_block: Any,
+    skip_connection_layers: list[int | str],
+    decoder_filters: tuple[int, ...] = (256, 128, 64, 32, 16),
+    n_upsample_blocks: int = 5,
+    classes: int = 1,
+    activation: str = "sigmoid",
+    use_batchnorm: bool = True,
+    weights_notop: str | None = None,
+    freeze_notop: bool = False,
+) -> models.Model:
     input_ = backbone.input
     x = backbone.output
 
@@ -176,21 +190,21 @@ def build_unet(
 
 
 def Unet(
-    backbone_name="vgg16",
-    input_shape=(None, None, 3),
-    classes=1,
-    activation="sigmoid",
-    weights=None,
-    weights_notop=None,
-    freeze_notop=False,
-    encoder_weights="imagenet",
-    encoder_freeze=False,
-    encoder_features="default",
-    decoder_block_type="upsampling",
-    decoder_filters=(256, 128, 64, 32, 16),
-    decoder_use_batchnorm=True,
+    backbone_name: str = "vgg16",
+    input_shape: tuple[int | None, int | None, int] = (None, None, 3),
+    classes: int = 1,
+    activation: str = "sigmoid",
+    weights: str | None = None,
+    weights_notop: str | None = None,
+    freeze_notop: bool = False,
+    encoder_weights: str | None = "imagenet",
+    encoder_freeze: bool = False,
+    encoder_features: str | list[int | str] = "default",
+    decoder_block_type: str = "upsampling",
+    decoder_filters: tuple[int, ...] = (256, 128, 64, 32, 16),
+    decoder_use_batchnorm: bool = True,
     **kwargs,
-):
+) -> models.Model:
     """Unet_ is a fully convolution neural network for image semantic segmentation
 
     Args:
@@ -252,12 +266,14 @@ def Unet(
     )
 
     if encoder_features == "default":
-        encoder_features = Backbones.get_feature_layers(backbone_name, n=4)
+        skip_connection_layers = Backbones.get_feature_layers(backbone_name, n=4)
+    else:
+        skip_connection_layers = encoder_features
 
     model = build_unet(
         backbone=backbone,
         decoder_block=decoder_block,
-        skip_connection_layers=encoder_features,
+        skip_connection_layers=skip_connection_layers,
         decoder_filters=decoder_filters,
         classes=classes,
         activation=activation,

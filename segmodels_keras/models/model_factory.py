@@ -82,13 +82,13 @@ def get_model(
     }
 
     if model_name == "unet":
-        return unet.Unet(**common_params, **kwargs)
+        return unet.Unet(**common_params, **kwargs)  # type: ignore[arg-type]
     elif model_name == "linknet":
-        return linknet.Linknet(**common_params, **kwargs)
+        return linknet.Linknet(**common_params, **kwargs)  # type: ignore[arg-type]
     elif model_name == "pspnet":
-        return pspnet.PSPNet(**common_params, **kwargs)
+        return pspnet.PSPNet(**common_params, **kwargs)  # type: ignore[arg-type]
     elif model_name == "fpn":
-        return fpn.FPN(**common_params, **kwargs)
+        return fpn.FPN(**common_params, **kwargs)  # type: ignore[arg-type]
     else:
         raise ValueError(
             f"Unknown model name: {model_name}. "
