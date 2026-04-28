@@ -113,6 +113,7 @@ def test_save_model_weights_notop(tmp_path, decoder):
     model = sm.get_model(
         model_name=decoder,
         backbone_name=backbone_name,
+        input_shape=(384, 384, 3),
         encoder_weights=None,
     )
 
@@ -125,6 +126,7 @@ def test_save_model_weights_notop(tmp_path, decoder):
     model = sm.get_model(
         model_name=decoder,
         backbone_name=backbone_name,
+        input_shape=(384, 384, 3),
         weights_notop=path,
         freeze_notop=True,
     )
