@@ -20,6 +20,10 @@ PSPNet
 ~~~~~~
 .. autofunction:: segmodels_keras.PSPNet
 
+Model Factory
+~~~~~~~~~~~~~
+.. autofunction:: segmodels_keras.model_factory.get_model
+
 metrics
 ~~~~~~~
 .. autofunction:: segmodels_keras.metrics.IOUScore
@@ -38,3 +42,4 @@ utils
 ~~~~~
 .. autofunction:: segmodels_keras.utils.set_trainable
 .. autofunction:: segmodels_keras.utils.save_model_weights_notop
+.. autofunction:: segmodels_keras.utils.load_weights
