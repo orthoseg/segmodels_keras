@@ -31,7 +31,7 @@
    keras 3 in keras <= 2.11 and the other way around (#28, #31, #33).
  - Use implementation + weights of keras.applications for inceptionresnetv2 and just
    retain the customizations needed for the skip connections (#13, #14)
- - General code improvements by applying ruff, mypy (#4)
+ - General code improvements by applying ruff, mypy (#4, #36)
  - Make the package typed (#30, #34)
 
 ### segmentation_models
