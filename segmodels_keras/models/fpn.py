@@ -1,3 +1,6 @@
+"""Module to create a FPN_ model on top of a given backbone."""
+
+from pathlib import Path
 from typing import Any
 
 from keras import backend, layers, models
@@ -13,7 +16,7 @@ from ._utils import freeze_model
 # ---------------------------------------------------------------------
 
 
-def get_submodules() -> dict[str, Any]:
+def _get_submodules() -> dict[str, Any]:
     return {
         "backend": backend,
         "models": models,
@@ -27,12 +30,12 @@ def get_submodules() -> dict[str, Any]:
 # ---------------------------------------------------------------------
 
 
-def Conv3x3BnReLU(
+def _Conv3x3BnReLU(
     filters: int,
     use_batchnorm: bool,
     name: str | None = None,
 ) -> Any:
-    kwargs = get_submodules()
+    kwargs = _get_submodules()
 
     def wrapper(input_tensor):
         return Conv2dBn(
@@ -49,7 +52,7 @@ def Conv3x3BnReLU(
     return wrapper
 
 
-def DoubleConv3x3BnReLU(
+def _DoubleConv3x3BnReLU(
     filters: int,
     use_batchnorm: bool,
     name: str | None = None,
@@ -60,14 +63,14 @@ def DoubleConv3x3BnReLU(
         name2 = name + "b"
 
     def wrapper(input_tensor):
-        x = Conv3x3BnReLU(filters, use_batchnorm, name=name1)(input_tensor)
-        x = Conv3x3BnReLU(filters, use_batchnorm, name=name2)(x)
+        x = _Conv3x3BnReLU(filters, use_batchnorm, name=name1)(input_tensor)
+        x = _Conv3x3BnReLU(filters, use_batchnorm, name=name2)(x)
         return x
 
     return wrapper
 
 
-def FPNBlock(pyramid_filters: int, stage: int) -> Any:
+def _FPNBlock(pyramid_filters: int, stage: int) -> Any:
     conv0_name = f"fpn_stage_p{stage}_pre_conv"
     conv1_name = f"fpn_stage_p{stage}_conv"
     add_name = f"fpn_stage_p{stage}_add"
@@ -108,7 +111,7 @@ def FPNBlock(pyramid_filters: int, stage: int) -> Any:
 # ---------------------------------------------------------------------
 
 
-def build_fpn(
+def _build_fpn(
     backbone: models.Model,
     skip_connection_layers: list[int | str],
     pyramid_filters: int = 256,
@@ -118,7 +121,7 @@ def build_fpn(
     use_batchnorm: bool = True,
     aggregation: str = "sum",
     dropout: float | None = None,
-    weights_notop: str | None = None,
+    weights_notop: str | Path | None = None,
     freeze_notop: bool = False,
 ) -> models.Model:
     input_ = backbone.input
@@ -133,22 +136,22 @@ def build_fpn(
     ]
 
     # build FPN pyramid
-    p5 = FPNBlock(pyramid_filters, stage=5)(x, skips[0])
-    p4 = FPNBlock(pyramid_filters, stage=4)(p5, skips[1])
-    p3 = FPNBlock(pyramid_filters, stage=3)(p4, skips[2])
-    p2 = FPNBlock(pyramid_filters, stage=2)(p3, skips[3])
+    p5 = _FPNBlock(pyramid_filters, stage=5)(x, skips[0])
+    p4 = _FPNBlock(pyramid_filters, stage=4)(p5, skips[1])
+    p3 = _FPNBlock(pyramid_filters, stage=3)(p4, skips[2])
+    p2 = _FPNBlock(pyramid_filters, stage=2)(p3, skips[3])
 
     # add segmentation head to each
-    s5 = DoubleConv3x3BnReLU(segmentation_filters, use_batchnorm, name="segm_stage5")(
+    s5 = _DoubleConv3x3BnReLU(segmentation_filters, use_batchnorm, name="segm_stage5")(
         p5
     )
-    s4 = DoubleConv3x3BnReLU(segmentation_filters, use_batchnorm, name="segm_stage4")(
+    s4 = _DoubleConv3x3BnReLU(segmentation_filters, use_batchnorm, name="segm_stage4")(
         p4
     )
-    s3 = DoubleConv3x3BnReLU(segmentation_filters, use_batchnorm, name="segm_stage3")(
+    s3 = _DoubleConv3x3BnReLU(segmentation_filters, use_batchnorm, name="segm_stage3")(
         p3
     )
-    s2 = DoubleConv3x3BnReLU(segmentation_filters, use_batchnorm, name="segm_stage2")(
+    s2 = _DoubleConv3x3BnReLU(segmentation_filters, use_batchnorm, name="segm_stage2")(
         p2
     )
 
@@ -180,7 +183,7 @@ def build_fpn(
         x = layers.SpatialDropout2D(dropout, name="pyramid_dropout")(x)
 
     # final stage
-    x = Conv3x3BnReLU(segmentation_filters, use_batchnorm, name="final_stage")(x)
+    x = _Conv3x3BnReLU(segmentation_filters, use_batchnorm, name="final_stage")(x)
     x = layers.UpSampling2D(
         size=(2, 2), interpolation="bilinear", name="final_upsampling"
     )(x)
@@ -220,8 +223,8 @@ def FPN(
     input_shape: tuple[int | None, int | None, int] = (None, None, 3),
     classes: int = 21,
     activation: str = "softmax",
-    weights: str | None = None,
-    weights_notop: str | None = None,
+    weights: str | Path | None = None,
+    weights_notop: str | Path | None = None,
     freeze_notop: bool = False,
     encoder_weights: str | None = "imagenet",
     encoder_freeze: bool = False,
@@ -232,7 +235,7 @@ def FPN(
     pyramid_dropout: float | None = None,
     **kwargs,
 ) -> models.Model:
-    """FPN_ is a fully convolution neural network for image semantic segmentation
+    """FPN_ is a fully convolution neural network for image semantic segmentation.
 
     Args:
         backbone_name: name of classification model (without last dense layers) used as
@@ -263,6 +266,7 @@ def FPN(
         pyramid_aggregation: one of 'sum' or 'concat'. The way to aggregate pyramid
             blocks.
         pyramid_dropout: spatial dropout rate for feature pyramid in range (0, 1).
+        kwargs: additional parameters for backbone model.
 
     Returns:
         ``keras.models.Model``: **FPN**
@@ -284,7 +288,7 @@ def FPN(
     else:
         skip_connection_layers = encoder_features
 
-    model = build_fpn(
+    model = _build_fpn(
         backbone=backbone,
         skip_connection_layers=skip_connection_layers,
         pyramid_filters=pyramid_block_filters,

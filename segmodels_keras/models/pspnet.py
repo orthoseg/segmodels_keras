@@ -1,3 +1,6 @@
+"""Module to create a PSPNet_ model on top of a given backbone."""
+
+from pathlib import Path
 from typing import Any
 
 from keras import backend, layers, models
@@ -140,7 +143,7 @@ def build_psp(
     classes: int = 21,
     activation: str = "softmax",
     dropout: float | None = None,
-    weights_notop: str | None = None,
+    weights_notop: str | Path | None = None,
     freeze_notop: bool = False,
 ) -> models.Model:
     input_ = backbone.input
@@ -202,8 +205,8 @@ def PSPNet(
     input_shape: tuple[int, int, int] = (384, 384, 3),
     classes: int = 21,
     activation: str = "softmax",
-    weights: str | None = None,
-    weights_notop: str | None = None,
+    weights: str | Path | None = None,
+    weights_notop: str | Path | None = None,
     freeze_notop: bool = False,
     encoder_weights: str | None = "imagenet",
     encoder_freeze: bool = False,
@@ -214,7 +217,7 @@ def PSPNet(
     psp_dropout: float | None = None,
     **kwargs,
 ) -> models.Model:
-    """PSPNet_ is a fully convolution neural network for image semantic segmentation
+    """PSPNet_ is a fully convolution neural network for image semantic segmentation.
 
     Args:
         backbone_name: name of classification model used as feature

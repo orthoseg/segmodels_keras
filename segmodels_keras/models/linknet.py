@@ -1,3 +1,6 @@
+"""Module to create a Linknet_ model on top of a given backbone."""
+
+from pathlib import Path
 from typing import Any
 
 from keras import backend, layers, models
@@ -13,7 +16,7 @@ from ._utils import freeze_model
 # ---------------------------------------------------------------------
 
 
-def get_submodules() -> dict[str, Any]:
+def _get_submodules() -> dict[str, Any]:
     return {
         "backend": backend,
         "models": models,
@@ -27,12 +30,12 @@ def get_submodules() -> dict[str, Any]:
 # ---------------------------------------------------------------------
 
 
-def Conv3x3BnReLU(
+def _Conv3x3BnReLU(
     filters: int,
     use_batchnorm: bool,
     name: str | None = None,
 ) -> Any:
-    kwargs = get_submodules()
+    kwargs = _get_submodules()
 
     def wrapper(input_tensor):
         return Conv2dBn(
@@ -49,12 +52,12 @@ def Conv3x3BnReLU(
     return wrapper
 
 
-def Conv1x1BnReLU(
+def _Conv1x1BnReLU(
     filters: int,
     use_batchnorm: bool,
     name: str | None = None,
 ) -> Any:
-    kwargs = get_submodules()
+    kwargs = _get_submodules()
 
     def wrapper(input_tensor):
         return Conv2dBn(
@@ -71,7 +74,7 @@ def Conv1x1BnReLU(
     return wrapper
 
 
-def DecoderUpsamplingX2Block(
+def _DecoderUpsamplingX2Block(
     filters: int | None,
     stage: int,
     use_batchnorm: bool,
@@ -88,12 +91,12 @@ def DecoderUpsamplingX2Block(
         input_filters = input_tensor.shape[channels_axis]
         output_filters = skip.shape[channels_axis] if skip is not None else filters
 
-        x = Conv1x1BnReLU(input_filters // 4, use_batchnorm, name=conv_block1_name)(
+        x = _Conv1x1BnReLU(input_filters // 4, use_batchnorm, name=conv_block1_name)(
             input_tensor
         )
         x = layers.UpSampling2D((2, 2), name=up_name)(x)
-        x = Conv3x3BnReLU(input_filters // 4, use_batchnorm, name=conv_block2_name)(x)
-        x = Conv1x1BnReLU(output_filters, use_batchnorm, name=conv_block3_name)(x)
+        x = _Conv3x3BnReLU(input_filters // 4, use_batchnorm, name=conv_block2_name)(x)
+        x = _Conv1x1BnReLU(output_filters, use_batchnorm, name=conv_block3_name)(x)
 
         if skip is not None:
             x = layers.Add(name=add_name)([x, skip])
@@ -102,7 +105,7 @@ def DecoderUpsamplingX2Block(
     return wrapper
 
 
-def DecoderTransposeX2Block(
+def _DecoderTransposeX2Block(
     filters: int | None,
     stage: int,
     use_batchnorm: bool,
@@ -120,7 +123,7 @@ def DecoderTransposeX2Block(
         input_filters = input_tensor.shape[channels_axis]
         output_filters = skip.shape[channels_axis] if skip is not None else filters
 
-        x = Conv1x1BnReLU(input_filters // 4, use_batchnorm, name=conv_block1_name)(
+        x = _Conv1x1BnReLU(input_filters // 4, use_batchnorm, name=conv_block1_name)(
             input_tensor
         )
         x = layers.Conv2DTranspose(
@@ -136,7 +139,7 @@ def DecoderTransposeX2Block(
             x = layers.BatchNormalization(axis=bn_axis, name=bn_name)(x)
 
         x = layers.Activation("relu", name=relu_name)(x)
-        x = Conv1x1BnReLU(output_filters, use_batchnorm, name=conv_block3_name)(x)
+        x = _Conv1x1BnReLU(output_filters, use_batchnorm, name=conv_block3_name)(x)
 
         if skip is not None:
             x = layers.Add(name=add_name)([x, skip])
@@ -151,7 +154,7 @@ def DecoderTransposeX2Block(
 # ---------------------------------------------------------------------
 
 
-def build_linknet(
+def _build_linknet(
     backbone: models.Model,
     decoder_block: Any,
     skip_connection_layers: list[int | str],
@@ -160,7 +163,7 @@ def build_linknet(
     classes: int = 1,
     activation: str = "sigmoid",
     use_batchnorm: bool = True,
-    weights_notop: str | None = None,
+    weights_notop: str | Path | None = None,
     freeze_notop: bool = False,
 ) -> models.Model:
     input_ = backbone.input
@@ -176,8 +179,8 @@ def build_linknet(
 
     # add center block if previous operation was maxpooling (for vgg models)
     if isinstance(backbone.layers[-1], layers.MaxPooling2D):
-        x = Conv3x3BnReLU(512, use_batchnorm, name="center_block1")(x)
-        x = Conv3x3BnReLU(512, use_batchnorm, name="center_block2")(x)
+        x = _Conv3x3BnReLU(512, use_batchnorm, name="center_block1")(x)
+        x = _Conv3x3BnReLU(512, use_batchnorm, name="center_block2")(x)
 
     # building decoder blocks
     for i in range(n_upsample_blocks):
@@ -224,8 +227,8 @@ def Linknet(
     input_shape: tuple[int | None, int | None, int] = (None, None, 3),
     classes: int = 1,
     activation: str = "sigmoid",
-    weights: str | None = None,
-    weights_notop: str | None = None,
+    weights: str | Path | None = None,
+    weights_notop: str | Path | None = None,
     freeze_notop: bool = False,
     encoder_weights: str | None = "imagenet",
     encoder_freeze: bool = False,
@@ -270,8 +273,9 @@ def Linknet(
         decoder_use_batchnorm: if ``True``, ``BatchNormalisation`` layer between
             ``Conv2D`` and ``Activation`` layers is used.
         decoder_block_type: one of
-                    - `upsampling`:  use ``UpSampling2D`` keras layer
-                    - `transpose`:   use ``Transpose2D`` keras layer
+            - `upsampling`:  use ``UpSampling2D`` keras layer
+            - `transpose`:   use ``Transpose2D`` keras layer
+        kwargs: additional parameters for backbone model.
 
     Returns:
         ``keras.models.Model``: **Linknet**
@@ -280,9 +284,9 @@ def Linknet(
         https://arxiv.org/pdf/1707.03718.pdf
     """
     if decoder_block_type == "upsampling":
-        decoder_block = DecoderUpsamplingX2Block
+        decoder_block = _DecoderUpsamplingX2Block
     elif decoder_block_type == "transpose":
-        decoder_block = DecoderTransposeX2Block
+        decoder_block = _DecoderTransposeX2Block
     else:
         raise ValueError(
             'Decoder block type should be in ("upsampling", "transpose"). '
@@ -302,7 +306,7 @@ def Linknet(
     else:
         skip_connection_layers = encoder_features
 
-    model = build_linknet(
+    model = _build_linknet(
         backbone=backbone,
         decoder_block=decoder_block,
         skip_connection_layers=skip_connection_layers,

@@ -1,3 +1,6 @@
+"""Module to create a Unet_ model on top of a given backbone."""
+
+from pathlib import Path
 from typing import Any
 
 from keras import backend, layers, models
@@ -13,7 +16,7 @@ from ._utils import freeze_model
 # ---------------------------------------------------------------------
 
 
-def get_submodules() -> dict[str, Any]:
+def _get_submodules() -> dict[str, Any]:
     return {
         "backend": backend,
         "models": models,
@@ -27,12 +30,12 @@ def get_submodules() -> dict[str, Any]:
 # ---------------------------------------------------------------------
 
 
-def Conv3x3BnReLU(
+def _Conv3x3BnReLU(
     filters: int,
     use_batchnorm: bool,
     name: str | None = None,
 ) -> Any:
-    kwargs = get_submodules()
+    kwargs = _get_submodules()
 
     def wrapper(input_tensor):
         return Conv2dBn(
@@ -49,7 +52,7 @@ def Conv3x3BnReLU(
     return wrapper
 
 
-def DecoderUpsamplingX2Block(
+def _DecoderUpsamplingX2Block(
     filters: int,
     stage: int,
     use_batchnorm: bool = False,
@@ -67,15 +70,15 @@ def DecoderUpsamplingX2Block(
         if skip is not None:
             x = layers.Concatenate(axis=concat_axis, name=concat_name)([x, skip])
 
-        x = Conv3x3BnReLU(filters, use_batchnorm, name=conv1_name)(x)
-        x = Conv3x3BnReLU(filters, use_batchnorm, name=conv2_name)(x)
+        x = _Conv3x3BnReLU(filters, use_batchnorm, name=conv1_name)(x)
+        x = _Conv3x3BnReLU(filters, use_batchnorm, name=conv2_name)(x)
 
         return x
 
     return wrapper
 
 
-def DecoderTransposeX2Block(
+def _DecoderTransposeX2Block(
     filters: int,
     stage: int,
     use_batchnorm: bool = False,
@@ -107,7 +110,7 @@ def DecoderTransposeX2Block(
         if skip is not None:
             x = layers.Concatenate(axis=concat_axis, name=concat_name)([x, skip])
 
-        x = Conv3x3BnReLU(filters, use_batchnorm, name=conv_block_name)(x)
+        x = _Conv3x3BnReLU(filters, use_batchnorm, name=conv_block_name)(x)
 
         return x
 
@@ -119,7 +122,7 @@ def DecoderTransposeX2Block(
 # ---------------------------------------------------------------------
 
 
-def build_unet(
+def _build_unet(
     backbone: models.Model,
     decoder_block: Any,
     skip_connection_layers: list[int | str],
@@ -128,7 +131,7 @@ def build_unet(
     classes: int = 1,
     activation: str = "sigmoid",
     use_batchnorm: bool = True,
-    weights_notop: str | None = None,
+    weights_notop: str | Path | None = None,
     freeze_notop: bool = False,
 ) -> models.Model:
     input_ = backbone.input
@@ -144,8 +147,8 @@ def build_unet(
 
     # add center block if previous operation was maxpooling (for vgg models)
     if isinstance(backbone.layers[-1], layers.MaxPooling2D):
-        x = Conv3x3BnReLU(512, use_batchnorm, name="center_block1")(x)
-        x = Conv3x3BnReLU(512, use_batchnorm, name="center_block2")(x)
+        x = _Conv3x3BnReLU(512, use_batchnorm, name="center_block1")(x)
+        x = _Conv3x3BnReLU(512, use_batchnorm, name="center_block2")(x)
 
     # building decoder blocks
     for i in range(n_upsample_blocks):
@@ -194,8 +197,8 @@ def Unet(
     input_shape: tuple[int | None, int | None, int] = (None, None, 3),
     classes: int = 1,
     activation: str = "sigmoid",
-    weights: str | None = None,
-    weights_notop: str | None = None,
+    weights: str | Path | None = None,
+    weights_notop: str | Path | None = None,
     freeze_notop: bool = False,
     encoder_weights: str | None = "imagenet",
     encoder_freeze: bool = False,
@@ -205,26 +208,24 @@ def Unet(
     decoder_use_batchnorm: bool = True,
     **kwargs,
 ) -> models.Model:
-    """Unet_ is a fully convolution neural network for image semantic segmentation
+    """Unet_ is a fully convolution neural network for image semantic segmentation.
 
     Args:
-        backbone_name: name of classification model (without last dense layers) used as
-            feature extractor to build segmentation model.
-        input_shape: shape of input data/image ``(H, W, C)``, in general
-            case you do not need to set ``H`` and ``W`` shapes, just pass
-            ``(None, None, C)`` to make your model be able to process images of any
-            size, but ``H`` and ``W`` of input images should be divisible by
-            factor ``32``.
+        backbone_name: name of classification model (without last dense layers)
+            used as feature extractor to build segmentation model.
+        input_shape: shape of input data/image ``(H, W, C)``, in general case you do not
+            need to set ``H`` and ``W`` shapes, just pass ``(None, None, C)`` to make
+            your model be able to process images of any size, but ``H`` and ``W`` of
+            input images should be divisible by factor ``32``.
         classes: a number of classes for output (output shape - ``(h, w, classes)``).
         activation: name of one of ``keras.activations`` for last model layer
             (e.g. ``sigmoid``, ``softmax``, ``linear``).
-        weights: optional, path to model weights to be loaded.
-        weights_notop: optional, path to model weights without top (without segmentation
-            head) to be loaded.
-        freeze_notop: if ``True``, set all layers of the model except the top as
-            non-trainable.
-        encoder_weights: one of ``None`` (random initialization), ``imagenet``
-            (pre-training on ImageNet).
+        weights: path to model weights for the entire model to be loaded.
+        weights_notop: path to model weights without top layer to be loaded.
+        freeze_notop: if ``True``, set all layers of the model except
+            the top layer as non-trainable.
+        encoder_weights: one of ``None`` (random initialization),
+            ``imagenet`` (pre-training on ImageNet).
         encoder_freeze: if ``True`` set all layers of encoder (backbone model) as
             non-trainable.
         encoder_features: a list of layer numbers or names starting from top of the
@@ -233,12 +234,14 @@ def Unet(
             ``DEFAULT_SKIP_CONNECTIONS``.
         decoder_block_type: one of blocks with following layers structure:
 
-            - `upsampling`:  ``UpSampling2D`` -> ``Conv2D`` -> ``Conv2D``
-            - `transpose`:   ``Transpose2D`` -> ``Conv2D``
+              - `upsampling`:  ``UpSampling2D`` -> ``Conv2D`` -> ``Conv2D``
+              - `transpose`:   ``Transpose2D`` -> ``Conv2D``
 
-        decoder_filters: list of numbers of ``Conv2D`` layer filters in decoder blocks
+        decoder_filters: list of numbers of ``Conv2D`` layer
+            filters in decoder blocks
         decoder_use_batchnorm: if ``True``, ``BatchNormalisation`` layer between
             ``Conv2D`` and ``Activation`` layers is used.
+        kwargs: additional parameters for backbone model.
 
     Returns:
         ``keras.models.Model``: **Unet**
@@ -248,9 +251,9 @@ def Unet(
 
     """
     if decoder_block_type == "upsampling":
-        decoder_block = DecoderUpsamplingX2Block
+        decoder_block = _DecoderUpsamplingX2Block
     elif decoder_block_type == "transpose":
-        decoder_block = DecoderTransposeX2Block
+        decoder_block = _DecoderTransposeX2Block
     else:
         raise ValueError(
             'Decoder block type should be in ("upsampling", "transpose"). '
@@ -270,7 +273,7 @@ def Unet(
     else:
         skip_connection_layers = encoder_features
 
-    model = build_unet(
+    model = _build_unet(
         backbone=backbone,
         decoder_block=decoder_block,
         skip_connection_layers=skip_connection_layers,
