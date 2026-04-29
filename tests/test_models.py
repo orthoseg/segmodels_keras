@@ -1,3 +1,5 @@
+"""Tests on the model creation functions in segmodels_keras.models."""
+
 import os
 
 import numpy as np

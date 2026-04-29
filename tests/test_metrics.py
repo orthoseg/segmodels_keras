@@ -1,3 +1,5 @@
+"""Tests on the metrics and loss functions."""
+
 import numpy as np
 import pytest
 

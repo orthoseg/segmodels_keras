@@ -12,7 +12,7 @@ class IOUScore(Metric):
     Jaccard), is a statistic used for comparing the similarity and diversity of sample
     sets. The Jaccard coefficient measures similarity between finite sample sets,
     and is defined as the size of the intersection divided by the size of the union of
-    the sample sets:
+    the sample sets.
 
     .. math:: J(A, B) = \frac{A \cap B}{A \cup B}
 

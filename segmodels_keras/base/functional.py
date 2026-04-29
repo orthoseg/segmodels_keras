@@ -44,7 +44,7 @@ def get_reduce_axes(per_image: bool, **kwargs: Any) -> list[int]:
 def gather_channels(
     *xs: Any, indexes: int | list[int] | None = None, **kwargs: Any
 ) -> tuple[Any, ...] | tuple[Any]:
-    """Slice tensors along channels axis by given indexes"""
+    """Slice tensors along channels axis by given indexes."""
     if indexes is None:
         return xs
     elif isinstance(indexes, (int)):
@@ -92,7 +92,7 @@ def iou_score(
     Jaccard), is a statistic used for comparing the similarity and diversity of sample
     sets. The Jaccard coefficient measures similarity between finite sample sets,
     and is defined as the size of the intersection divided by the size of the union of
-    the sample sets:
+    the sample sets.
 
     .. math:: J(A, B) = \frac{A \cap B}{A \cup B}
 
@@ -317,7 +317,7 @@ def binary_crossentropy(gt, pr, **kwargs):  # noqa: ARG001
 
 
 def categorical_focal_loss(gt, pr, gamma=2.0, alpha=0.25, class_indexes=None, **kwargs):
-    r"""Implementation of Focal Loss from the paper in multiclass classification
+    r"""Implementation of Focal Loss from the paper in multiclass classification.
 
     Formula:
         loss = - gt * alpha * ((1 - pr)^gamma) * log(pr)
@@ -343,7 +343,7 @@ def categorical_focal_loss(gt, pr, gamma=2.0, alpha=0.25, class_indexes=None, **
 
 
 def binary_focal_loss(gt, pr, gamma=2.0, alpha=0.25, **kwargs):  # noqa: ARG001
-    r"""Implementation of Focal Loss from the paper in binary classification
+    r"""Implementation of Focal Loss from the paper in binary classification.
 
     Formula:
         loss = - gt * alpha * ((1 - pr)^gamma) * log(pr) \

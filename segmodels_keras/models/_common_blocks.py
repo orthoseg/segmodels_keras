@@ -19,8 +19,7 @@ def Conv2dBn(
     use_batchnorm=False,
     **kwargs,
 ):
-    """Extension of Conv2D layer with batchnorm"""
-
+    """Extension of Conv2D layer with batchnorm."""
     conv_name, act_name, bn_name = None, None, None
     block_name = kwargs.pop("name", None)
 

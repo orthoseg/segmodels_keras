@@ -1,4 +1,4 @@
-"""Utility functions for segmentation models"""
+"""Utility functions for segmentation models."""
 
 from collections import defaultdict
 from pathlib import Path
@@ -230,7 +230,7 @@ def save_model_weights_notop(
 
 
 def set_trainable(model: models.Model, recompile: bool = True, **kwargs: Any) -> None:  # noqa: ARG001
-    """Set all layers of model trainable and recompile it
+    """Set all layers of model trainable and recompile it.
 
     Note:
         Model is recompiled using same optimizer, loss and metrics::
@@ -245,7 +245,9 @@ def set_trainable(model: models.Model, recompile: bool = True, **kwargs: Any) ->
             )
 
     Args:
-        model (``keras.models.Model``): instance of keras model
+        model (``keras.models.Model``): instance of keras model.
+        recompile: whether to recompile the model after setting trainable.
+        **kwargs: additional keyword arguments (unused).
 
     """
     for layer in model.layers:
@@ -271,21 +273,22 @@ def set_regularization(
     gamma_regularizer: Any = None,
     **kwargs: dict[str, Any],  # noqa: ARG001
 ) -> models.Model:
-    """Set regularizers to all layers
+    """Set regularizers to all layers.
 
     Note:
        Returned model's config is updated correctly
 
     Args:
-        model (``keras.models.Model``): instance of keras model
-        kernel_regularizer(``regularizer`): regularizer of kernels
-        bias_regularizer(``regularizer``): regularizer of bias
-        activity_regularizer(``regularizer``): regularizer of activity
-        gamma_regularizer(``regularizer``): regularizer of gamma of BatchNormalization
-        beta_regularizer(``regularizer``): regularizer of beta of BatchNormalization
+        model: instance of keras model.
+        kernel_regularizer: regularizer of kernels.
+        bias_regularizer: regularizer of bias.
+        activity_regularizer: regularizer of activity.
+        gamma_regularizer: regularizer of gamma of BatchNormalization.
+        beta_regularizer: regularizer of beta of BatchNormalization.
+        **kwargs: additional keyword arguments (unused).
 
-    Return:
-        out (``Model``): config updated model
+    Returns:
+        out: config updated model.
     """
     for layer in model.layers:
         # set kernel_regularizer

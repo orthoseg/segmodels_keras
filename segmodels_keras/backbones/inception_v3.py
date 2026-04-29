@@ -1,10 +1,13 @@
 """Inception V3 model for Keras.
+
 Note that the input image format for this model is different than for
 the VGG16 and ResNet models (299x299 instead of 224x224),
 and that the input preprocessing function is also different (same as Xception).
-# Reference
+
+References:
+----------
 - [Rethinking the Inception Architecture for Computer Vision](
-    http://arxiv.org/abs/1512.00567) (CVPR 2016)
+    http://arxiv.org/abs/1512.00567) (CVPR 2016).
 """
 
 import os
@@ -30,6 +33,7 @@ WEIGHTS_PATH_NO_TOP = (
 
 def conv2d_bn(x, filters, num_row, num_col, padding="same", strides=(1, 1), name=None):
     """Utility function to apply conv + BN.
+
     # Arguments
         x: input tensor.
         filters: filters in `Conv2D`.
@@ -76,9 +80,11 @@ def InceptionV3(
     **kwargs,  # noqa: ARG001
 ):
     """Instantiates the Inception v3 architecture.
+
     Optionally loads weights pre-trained on ImageNet.
     Note that the data format convention used by the model is
     the one specified in your Keras config at `~/.keras/keras.json`.
+
     # Arguments
         include_top: whether to include the fully-connected
             layer at the top of the network.
@@ -372,6 +378,7 @@ def InceptionV3(
 
 def preprocess_input(x, **kwargs):
     """Preprocesses a numpy array encoding a batch of images.
+
     # Arguments
         x: a 4D numpy array consists of RGB values within [0, 255].
     # Returns

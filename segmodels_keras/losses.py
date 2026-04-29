@@ -7,7 +7,9 @@ SMOOTH: float = 1e-5
 
 
 class JaccardLoss(Loss):
-    r"""Creates a criterion to measure Jaccard loss:
+    r"""Creates a criterion to measure Jaccard loss.
+
+    Details:
 
     .. math:: L(A, B) = 1 - \frac{A \cap B}{A \cup B}
 
@@ -60,7 +62,9 @@ class JaccardLoss(Loss):
 
 
 class DiceLoss(Loss):
-    r"""Creates a criterion to measure Dice loss:
+    r"""Creates a criterion to measure Dice loss.
+
+    Details:
 
     .. math:: L(precision, recall) = 1 - (1 + \beta^2) \frac{precision \cdot recall}
         {\beta^2 \cdot precision + recall}

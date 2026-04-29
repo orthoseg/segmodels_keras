@@ -109,7 +109,6 @@ def ResNet(
     Returns:
         A ``keras.Model`` instance.
     """
-
     # Determine proper input shape
     input_shape = _obtain_input_shape(
         input_shape,

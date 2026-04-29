@@ -44,6 +44,7 @@ def GroupConv2D(
             If you don't specify anything, no activation is applied
             (ie. "linear" activation: a(x) = x).
         padding: one of "valid" or "same" (case-insensitive).
+        kwargs: additional keyword arguments (unused).
 
     Input shape:
         4D tensor with shape: (batch, rows, cols, channels) if data_format is
@@ -97,12 +98,14 @@ def expand_dims(x, channels_axis):
 
 
 def ChannelSE(reduction=16, **kwargs):  # noqa: ARG001
-    """
-    Squeeze and Excitation block, reimplementation inspired by
-        https://github.com/Cadene/pretrained-models.pytorch/blob/master/pretrainedmodels/models/senet.py
+    """Squeeze and Excitation block.
+
+    Reimplementation inspired by
+    https://github.com/Cadene/pretrained-models.pytorch/blob/master/pretrainedmodels/models/senet.py.
 
     Args:
         reduction: channels squeeze factor
+        kwargs: additional keyword arguments (unused).
 
     """
     channels_axis = 3 if backend.image_data_format() == "channels_last" else 1
