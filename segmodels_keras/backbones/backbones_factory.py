@@ -1,3 +1,6 @@
+"""Backbones factory module."""
+
+import keras
 import keras.applications as ka
 
 from . import inception_resnet_v2 as irv2
@@ -264,12 +267,17 @@ class BackbonesFactory:
 
     @property
     def models(self):
+        """Get the dictionary of available backbones."""
         return self._models
 
     def models_names(self):
+        """Get the list of available backbone names."""
         return list(self.models.keys())
 
-    def get_backbone(self, name, *args, **kwargs):
+        """Get a backbone model by name."""
+
+    def get_backbone(self, name, *args, **kwargs) -> keras.Model:
+        """Get a backbone model by name."""
         backbone = self._models.get(name)
         if backbone is None:
             raise ValueError(f"Backbone with name '{name}' is not supported.")
@@ -279,12 +287,15 @@ class BackbonesFactory:
         return model
 
     def get_feature_layers(self, name, n=5):
+        """Get the list of skip layers for a backbone by name."""
         return self._models.get(name)[2][:n]
 
     def get_preprocessing(self, name):
+        """Get the preprocessing function for a backbone by name."""
         return self._models.get(name)[1]
 
     def get_custom_objects(self, name):
+        """Get the custom objects for a backbone by name."""
         if name == "inceptionresnetv2":
             return irv2.get_custom_objects()
         return {}

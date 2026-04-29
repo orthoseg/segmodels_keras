@@ -1,3 +1,5 @@
+"""Segmentation models metrics for Keras."""
+
 from typing import Any
 
 from .base import Metric
@@ -7,7 +9,9 @@ SMOOTH: float = 1e-5
 
 
 class IOUScore(Metric):
-    r"""The `Jaccard index`_, also known as Intersection over Union and the Jaccard
+    r"""The `Jaccard index`_.
+
+    Also known as Intersection over Union and the Jaccard
     similarity coefficient (originally coined coefficient de communauté by Paul
     Jaccard), is a statistic used for comparing the similarity and diversity of sample
     sets. The Jaccard coefficient measures similarity between finite sample sets,
@@ -41,7 +45,7 @@ class IOUScore(Metric):
         model.compile('SGD', loss=loss, metrics=[metric])
     """
 
-    def __init__(
+    def __init__(  # noqa: D107
         self,
         class_weights: Any = None,
         class_indexes: Any = None,
@@ -58,7 +62,7 @@ class IOUScore(Metric):
         self.per_image = per_image
         self.smooth = smooth
 
-    def __call__(self, gt, pr):
+    def __call__(self, gt, pr):  # noqa: D102
         return F.iou_score(
             gt,
             pr,
@@ -72,10 +76,11 @@ class IOUScore(Metric):
 
 
 class FScore(Metric):
-    r"""The F-score (Dice coefficient) can be interpreted as a weighted average of the
-    precision and recall, where an F-score reaches its best value at 1 and worst score
-    at 0. The relative contribution of ``precision`` and ``recall`` to the F1-score are
-    equal.
+    r"""The F-score (Dice coefficient).
+
+    This can be interpreted as a weighted average of the precision and recall,
+    where an F-score reaches its best value at 1 and worst score at 0. The relative
+    contribution of ``precision`` and ``recall`` to the F1-score are equal.
 
     The formula for the F score is:
 
@@ -115,7 +120,7 @@ class FScore(Metric):
         model.compile('SGD', loss=loss, metrics=[metric])
     """  # noqa: E501
 
-    def __init__(
+    def __init__(  # noqa: D107
         self,
         beta: int | float = 1,
         class_weights: Any = None,
@@ -134,7 +139,7 @@ class FScore(Metric):
         self.per_image = per_image
         self.smooth = smooth
 
-    def __call__(self, gt, pr):
+    def __call__(self, gt, pr):  # noqa: D102
         return F.f_score(
             gt,
             pr,
@@ -149,8 +154,7 @@ class FScore(Metric):
 
 
 class Precision(Metric):
-    r"""Creates a criterion that measures the Precision between the
-    ground truth (gt) and the prediction (pr).
+    r"""Measures the Precision between the ground truth (gt) and the prediction (pr).
 
     .. math:: F_\beta(tp, fp) = \frac{tp} {(tp + fp)}
 
@@ -182,7 +186,7 @@ class Precision(Metric):
         model.compile('SGD', loss=loss, metrics=[metric])
     """
 
-    def __init__(
+    def __init__(  # noqa: D107
         self,
         class_weights: Any = None,
         class_indexes: Any = None,
@@ -199,7 +203,7 @@ class Precision(Metric):
         self.per_image = per_image
         self.smooth = smooth
 
-    def __call__(self, gt, pr):
+    def __call__(self, gt, pr):  # noqa: D102
         return F.precision(
             gt,
             pr,
@@ -213,8 +217,7 @@ class Precision(Metric):
 
 
 class Recall(Metric):
-    r"""Creates a criterion that measures the Precision between the
-    ground truth (gt) and the prediction (pr).
+    r"""Measures the Precision between the ground truth (gt) and the prediction (pr).
 
     .. math:: F_\beta(tp, fn) = \frac{tp} {(tp + fn)}
 
@@ -241,11 +244,11 @@ class Recall(Metric):
 
     .. code:: python
 
-        metric = Precision()
+        metric = Recall()
         model.compile('SGD', loss=loss, metrics=[metric])
     """
 
-    def __init__(
+    def __init__(  # noqa: D107
         self,
         class_weights: Any = None,
         class_indexes: Any = None,
@@ -262,7 +265,7 @@ class Recall(Metric):
         self.per_image = per_image
         self.smooth = smooth
 
-    def __call__(self, gt, pr):
+    def __call__(self, gt, pr):  # noqa: D102
         return F.recall(
             gt,
             pr,

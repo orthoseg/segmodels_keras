@@ -1,3 +1,5 @@
+"""Functional utilities for segmentation models."""
+
 from typing import Any
 
 import keras
@@ -33,6 +35,7 @@ def _gather_channels(x: Any, indexes: Any, **kwargs: Any) -> Any:
 
 
 def get_reduce_axes(per_image: bool, **kwargs: Any) -> list[int]:
+    """Get axes for reduction operations."""
     backend = kwargs["backend"]
 
     axes = [1, 2] if backend.image_data_format() == "channels_last" else [2, 3]
@@ -54,6 +57,7 @@ def gather_channels(
 
 
 def round_if_needed(x, threshold, **kwargs):
+    """Round predictions if threshold is not None."""
     if threshold is not None:
         x = ops.greater(x, threshold)
         if not KERAS_GTE_3:
@@ -65,6 +69,10 @@ def round_if_needed(x, threshold, **kwargs):
 
 
 def average(x, per_image=False, class_weights=None, **kwargs):  # noqa: ARG001
+    """Calculate the average of a tensor.
+
+    Optionally per image and with class weights.
+    """
     if per_image:
         x = ops.mean(x, axis=0)
     if class_weights is not None:
@@ -87,9 +95,11 @@ def iou_score(
     threshold=None,
     **kwargs,
 ):
-    r"""The `Jaccard index`_, also known as Intersection over Union and the Jaccard
-    similarity coefficient (originally coined coefficient de communauté by Paul
-    Jaccard), is a statistic used for comparing the similarity and diversity of sample
+    r"""The `Jaccard index`_.
+
+    Also known as Intersection over Union and the Jaccard similarity coefficient
+    (originally coined coefficient de communauté by Paul Jaccard),
+    is a statistic used for comparing the similarity and diversity of sample
     sets. The Jaccard coefficient measures similarity between finite sample sets,
     and is defined as the size of the intersection divided by the size of the union of
     the sample sets.
@@ -107,6 +117,8 @@ def iou_score(
             else over whole batch
         threshold: value to round predictions (use ``>`` comparison), if ``None``
             prediction will not be round
+        kwargs: additional arguments, for example, ``backend`` is required for some
+            operations
 
     Returns:
         IoU/Jaccard score in range [0, 1]
@@ -139,9 +151,10 @@ def f_score(
     threshold=None,
     **kwargs,
 ):
-    r"""The F-score (Dice coefficient) can be interpreted as a weighted average of the
-    precision and recall, where an F-score reaches its best value at 1 and worst score
-    at 0.
+    r"""The F-score (Dice coefficient).
+
+    Can be interpreted as a weighted average of the precision and recall, where an
+    F-score reaches its best value at 1 and worst score at 0.
     The relative contribution of ``precision`` and ``recall`` to the F1-score are equal.
 
     The formula for the F score is:
@@ -171,6 +184,8 @@ def f_score(
             else over whole batch
         threshold: value to round predictions (use ``>`` comparison), if ``None``
             prediction will not be round
+        kwargs: additional arguments, for example, ``backend`` is required for some
+            operations
 
     Returns:
         F-score in range [0, 1]
@@ -224,6 +239,8 @@ def precision(
         threshold: Float value to round predictions (use ``>`` comparison), if ``None``
             prediction will not be round.
         name: Optional string, if ``None`` default ``precision`` name is used.
+        kwargs: additional arguments, for example, ``backend`` is required for some
+            operations
 
     Returns:
         float: precision score
@@ -273,6 +290,8 @@ def recall(
         threshold: Float value to round predictions (use ``>`` comparison), if ``None``
             prediction will not be round.
         name: Optional string, if ``None`` default ``precision`` name is used.
+        kwargs: additional arguments, for example, ``backend`` is required for some
+            operations
 
     Returns:
         float: recall score
@@ -296,6 +315,7 @@ def recall(
 
 
 def categorical_crossentropy(gt, pr, class_weights=1.0, class_indexes=None, **kwargs):
+    """Calculate categorical crossentropy loss between gt and pr tensors."""
     backend = kwargs["backend"]
 
     gt, pr = gather_channels(gt, pr, indexes=class_indexes, **kwargs)
@@ -313,6 +333,7 @@ def categorical_crossentropy(gt, pr, class_weights=1.0, class_indexes=None, **kw
 
 
 def binary_crossentropy(gt, pr, **kwargs):  # noqa: ARG001
+    """Calculate binary crossentropy loss between gt and pr tensors."""
     return ops.mean(ops.binary_crossentropy(gt, pr))
 
 
@@ -329,6 +350,8 @@ def categorical_focal_loss(gt, pr, gamma=2.0, alpha=0.25, class_indexes=None, **
         gamma: focusing parameter for modulating factor (1-p), default 2.0
         class_indexes: Optional integer or list of integers, classes to consider, if
             ``None`` all classes are used.
+        kwargs: additional arguments, for example, ``backend`` is required for some
+            operations
 
     """
     gt, pr = gather_channels(gt, pr, indexes=class_indexes, **kwargs)
@@ -354,6 +377,8 @@ def binary_focal_loss(gt, pr, gamma=2.0, alpha=0.25, **kwargs):  # noqa: ARG001
         pr: prediction 4D keras tensor (B, H, W, C) or (B, C, H, W)
         alpha: the same as weighting factor in balanced cross entropy, default 0.25
         gamma: focusing parameter for modulating factor (1-p), default 2.0
+        kwargs: additional arguments, for example, ``backend`` is required for some
+            operations
 
     """
     # clip to prevent NaN's and Inf's

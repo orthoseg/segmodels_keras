@@ -1,3 +1,5 @@
+"""A setuptools based setup module."""
+
 #!/usr/bin/env python
 
 # Note: To use the 'upload' functionality of this file, you must:

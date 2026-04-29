@@ -1,3 +1,5 @@
+"""Segmentation Models for Keras."""
+
 import functools  # noqa: I001
 import os
 from typing import Any
@@ -118,6 +120,7 @@ get_available_backbone_names = Backbones.models_names
 
 
 def get_preprocessing(name: str) -> Callable[[Any], Any]:
+    """Get the preprocessing function for a backbone by name."""
     return Backbones.get_preprocessing(name)
 
 

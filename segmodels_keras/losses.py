@@ -1,3 +1,5 @@
+"""Losses for segmentation models."""
+
 from typing import Any
 
 from .base import Loss
@@ -35,7 +37,7 @@ class JaccardLoss(Loss):
         model.compile('SGD', loss=loss)
     """
 
-    def __init__(
+    def __init__(  # noqa: D107
         self,
         class_weights: Any = None,
         class_indexes: Any = None,
@@ -48,7 +50,7 @@ class JaccardLoss(Loss):
         self.per_image = per_image
         self.smooth = smooth
 
-    def __call__(self, gt, pr):
+    def __call__(self, gt, pr):  # noqa: D102
         return 1 - F.iou_score(
             gt,
             pr,
@@ -100,7 +102,7 @@ class DiceLoss(Loss):
         model.compile('SGD', loss=loss)
     """  # noqa: E501
 
-    def __init__(
+    def __init__(  # noqa: D107
         self,
         beta: int | float = 1,
         class_weights: Any = None,
@@ -115,7 +117,7 @@ class DiceLoss(Loss):
         self.per_image = per_image
         self.smooth = smooth
 
-    def __call__(self, gt, pr):
+    def __call__(self, gt, pr):  # noqa: D102
         return 1 - F.f_score(
             gt,
             pr,
@@ -130,8 +132,7 @@ class DiceLoss(Loss):
 
 
 class BinaryCELoss(Loss):
-    r"""Creates a criterion that measures the Binary Cross Entropy between the
-    ground truth (gt) and the prediction (pr).
+    r"""Measures Binary Cross Entropy between ground truth (gt) and prediction (pr).
 
     .. math:: L(gt, pr) = - gt \cdot \log(pr) - (1 - gt) \cdot \log(1 - pr)
 
@@ -147,16 +148,15 @@ class BinaryCELoss(Loss):
         model.compile('SGD', loss=loss)
     """
 
-    def __init__(self) -> None:
+    def __init__(self) -> None:  # noqa: D107
         super().__init__(name="binary_crossentropy")
 
-    def __call__(self, gt, pr):
+    def __call__(self, gt, pr):  # noqa: D102
         return F.binary_crossentropy(gt, pr, **self.submodules)
 
 
 class CategoricalCELoss(Loss):
-    r"""Creates a criterion that measures the Categorical Cross Entropy between the
-    ground truth (gt) and the prediction (pr).
+    r"""Measures Categorical Cross Entropy between groundtruth (gt) and prediction (pr).
 
     .. math:: L(gt, pr) = - gt \cdot \log(pr)
 
@@ -178,12 +178,12 @@ class CategoricalCELoss(Loss):
         model.compile('SGD', loss=loss)
     """
 
-    def __init__(self, class_weights: Any = None, class_indexes: Any = None) -> None:
+    def __init__(self, class_weights: Any = None, class_indexes: Any = None) -> None:  # noqa: D107
         super().__init__(name="categorical_crossentropy")
         self.class_weights = class_weights if class_weights is not None else 1
         self.class_indexes = class_indexes
 
-    def __call__(self, gt, pr):
+    def __call__(self, gt, pr):  # noqa: D102
         return F.categorical_crossentropy(
             gt,
             pr,
@@ -194,8 +194,7 @@ class CategoricalCELoss(Loss):
 
 
 class CategoricalFocalLoss(Loss):
-    r"""Creates a criterion that measures the Categorical Focal Loss between the
-    ground truth (gt) and the prediction (pr).
+    r"""Measures Categorical Focal Loss between ground truth (gt) and prediction (pr).
 
     .. math:: L(gt, pr) = - gt \cdot \alpha \cdot (1 - pr)^\gamma \cdot \log(pr)
 
@@ -219,7 +218,7 @@ class CategoricalFocalLoss(Loss):
             model.compile('SGD', loss=loss)
     """
 
-    def __init__(
+    def __init__(  # noqa: D107
         self, alpha: float = 0.25, gamma: float = 2.0, class_indexes: Any = None
     ) -> None:
         super().__init__(name="focal_loss")
@@ -227,7 +226,7 @@ class CategoricalFocalLoss(Loss):
         self.gamma = gamma
         self.class_indexes = class_indexes
 
-    def __call__(self, gt, pr):
+    def __call__(self, gt, pr):  # noqa: D102
         return F.categorical_focal_loss(
             gt,
             pr,
@@ -239,8 +238,7 @@ class CategoricalFocalLoss(Loss):
 
 
 class BinaryFocalLoss(Loss):
-    r"""Creates a criterion that measures the Binary Focal Loss between the
-    ground truth (gt) and the prediction (pr).
+    r"""Measures the Binary Focal Loss between ground truth (gt) and prediction (pr).
 
     .. math:: L(gt, pr) = - gt \alpha (1 - pr)^\gamma \log(pr) - (1 - gt) \alpha pr^\gamma \log(1 - pr)
 
@@ -262,12 +260,12 @@ class BinaryFocalLoss(Loss):
         model.compile('SGD', loss=loss)
     """  # noqa: E501
 
-    def __init__(self, alpha: float = 0.25, gamma: float = 2.0) -> None:
+    def __init__(self, alpha: float = 0.25, gamma: float = 2.0) -> None:  # noqa: D107
         super().__init__(name="binary_focal_loss")
         self.alpha = alpha
         self.gamma = gamma
 
-    def __call__(self, gt, pr):
+    def __call__(self, gt, pr):  # noqa: D102
         return F.binary_focal_loss(
             gt, pr, alpha=self.alpha, gamma=self.gamma, **self.submodules
         )

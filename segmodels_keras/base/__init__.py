@@ -1,3 +1,5 @@
+"""Base module for segmentation models in Keras."""
+
 from . import functional as functional
 from .objects import KerasObject as KerasObject
 from .objects import Loss as Loss

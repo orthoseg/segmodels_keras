@@ -37,7 +37,7 @@ select = [
     "NPY",  # NumPy-specific rules
     "E",  # pycodestyle errors
     "W",  # pycodestyle warnings
-    # "D",  # pydocstyle
+    "D",  # pydocstyle
     "F",  # pyflakes
     "PLC",  # pylint convention
     "PLE",  # pylint error

@@ -314,16 +314,18 @@ def conv2d_bn(
 
 
 class CustomScaleLayer(layers.Layer):
-    def __init__(self, scale, **kwargs):
+    """Custom layer to scale the residuals before adding them to the shortcut branch."""
+
+    def __init__(self, scale, **kwargs):  # noqa: D107
         super().__init__(**kwargs)
         self.scale = scale
 
-    def get_config(self):
+    def get_config(self):  # noqa: D102
         config = super().get_config()
         config.update({"scale": self.scale})
         return config
 
-    def call(self, inputs):
+    def call(self, inputs):  # noqa: D102
         return inputs[0] + inputs[1] * self.scale
 
 
@@ -416,6 +418,9 @@ def preprocess_input(x, data_format=None):
 
     Args:
         x: a 4D numpy array consists of RGB values within [0, 255].
+        data_format: image data format, either "channels_first" or
+            "channels_last". Defaults to the value found in
+            `keras.backend.image_data_format()`.
 
     Returns:
         Preprocessed array.
@@ -443,4 +448,5 @@ def decode_predictions(preds, top=5):
 
 
 def get_custom_objects():
+    """Returns a dictionary containing the custom objects used by the model."""
     return {"CustomScaleLayer": CustomScaleLayer}

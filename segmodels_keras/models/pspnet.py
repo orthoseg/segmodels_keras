@@ -16,7 +16,7 @@ from ._utils import freeze_model
 # ---------------------------------------------------------------------
 
 
-def get_submodules() -> dict[str, Any]:
+def _get_submodules() -> dict[str, Any]:
     return {
         "backend": backend,
         "models": models,
@@ -25,7 +25,7 @@ def get_submodules() -> dict[str, Any]:
     }
 
 
-def check_input_shape(
+def _check_input_shape(
     input_shape: tuple[int, int, int] | tuple[int | None, int | None, int],
     factor: int,
 ) -> None:
@@ -61,12 +61,8 @@ def check_input_shape(
 # ---------------------------------------------------------------------
 
 
-def Conv1x1BnReLU(
-    filters: int,
-    use_batchnorm: bool,
-    name: str | None = None,
-) -> Any:
-    kwargs = get_submodules()
+def _Conv1x1BnReLU(filters: int, use_batchnorm: bool, name: str | None = None) -> Any:
+    kwargs = _get_submodules()
 
     def wrapper(input_tensor):
         return Conv2dBn(
@@ -83,7 +79,7 @@ def Conv1x1BnReLU(
     return wrapper
 
 
-def SpatialContextBlock(
+def _SpatialContextBlock(
     level: int,
     conv_filters: int = 512,
     pooling_type: str = "avg",
@@ -119,7 +115,7 @@ def SpatialContextBlock(
         x = Pooling2D(pool_size, strides=pool_size, padding="same", name=pooling_name)(
             input_tensor
         )
-        x = Conv1x1BnReLU(conv_filters, use_batchnorm, name=conv_block_name)(x)
+        x = _Conv1x1BnReLU(conv_filters, use_batchnorm, name=conv_block_name)(x)
         x = layers.UpSampling2D(
             up_size, interpolation="bilinear", name=upsampling_name
         )(x)
@@ -133,7 +129,7 @@ def SpatialContextBlock(
 # ---------------------------------------------------------------------
 
 
-def build_psp(
+def _build_psp(
     backbone: models.Model,
     psp_layer_idx: int | str,
     pooling_type: str = "avg",
@@ -154,15 +150,15 @@ def build_psp(
     )
 
     # build spatial pyramid
-    x1 = SpatialContextBlock(1, conv_filters, pooling_type, use_batchnorm)(x)
-    x2 = SpatialContextBlock(2, conv_filters, pooling_type, use_batchnorm)(x)
-    x3 = SpatialContextBlock(3, conv_filters, pooling_type, use_batchnorm)(x)
-    x6 = SpatialContextBlock(6, conv_filters, pooling_type, use_batchnorm)(x)
+    x1 = _SpatialContextBlock(1, conv_filters, pooling_type, use_batchnorm)(x)
+    x2 = _SpatialContextBlock(2, conv_filters, pooling_type, use_batchnorm)(x)
+    x3 = _SpatialContextBlock(3, conv_filters, pooling_type, use_batchnorm)(x)
+    x6 = _SpatialContextBlock(6, conv_filters, pooling_type, use_batchnorm)(x)
 
     # aggregate spatial pyramid
     concat_axis = 3 if backend.image_data_format() == "channels_last" else 1
     x = layers.Concatenate(axis=concat_axis, name="psp_concat")([x, x1, x2, x3, x6])
-    x = Conv1x1BnReLU(conv_filters, use_batchnorm, name="aggregation")(x)
+    x = _Conv1x1BnReLU(conv_filters, use_batchnorm, name="aggregation")(x)
 
     # model regularization
     if dropout is not None:
@@ -245,6 +241,8 @@ def PSPNet(
         psp_use_batchnorm: if ``True``, ``BatchNormalisation`` layer between ``Conv2D``
             and ``Activation`` layers is used.
         psp_dropout: dropout rate between 0 and 1.
+        kwargs: additional keyword arguments for some backbones (e.g. ``groups`` for
+            ``resnext50`` and ``resnext101`` backbones).
 
     Returns:
         ``keras.models.Model``: **PSPNet**
@@ -254,7 +252,7 @@ def PSPNet(
 
     """
     # control image input shape
-    check_input_shape(input_shape, downsample_factor)
+    _check_input_shape(input_shape, downsample_factor)
 
     backbone = Backbones.get_backbone(
         backbone_name,
@@ -275,7 +273,7 @@ def PSPNet(
     else:
         raise ValueError(f"Unsupported factor - `{downsample_factor}`, Use 4, 8 or 16.")
 
-    model = build_psp(
+    model = _build_psp(
         backbone,
         psp_layer_idx,
         pooling_type=psp_pooling_type,
