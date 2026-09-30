@@ -22,7 +22,8 @@
    anymore for these models.
 
 ###### Areas of improvement
- - Add extra backbones: resnet50v2, resnet101v2, resnet152v2 and efficientnetv2m (#6)
+ - Add extra backbones: resnet50v2, resnet101v2, resnet152v2, efficientnetv2s,
+   efficientnetv2m and efficientnetv2l (#6, #41)
  - Add support for keras v3 (#5)
  - Add support to provide weights without top when creating a model (#19)
  - Add support to freeze all layers except for the top layers (#24)

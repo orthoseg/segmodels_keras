@@ -30,7 +30,7 @@ def get_test_backbones():
             "resnet50",
             "inceptionresnetv2",
             "efficientnetb0",
-            "efficientnetv2m",
+            "efficientnetv2s",
         ]
     else:
         return get_available_backbone_names()

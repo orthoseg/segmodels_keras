@@ -252,15 +252,37 @@ class BackbonesFactory:
             ),
         ],
         # EfficientNetV2
-        # Skip layers from https://github.com/chinefed/segmentation_models_fork
+        # Stage layout differs from EfficientNet-Bx.
+        # Skip layers selected to match decoder resolutions:
+        # x16 -> x8 -> x4 -> x2
+        "efficientnetv2s": (
+            ka.EfficientNetV2S,
+            ka.efficientnet_v2.preprocess_input,
+            (
+                "block6a_expand_conv",  # 14x14
+                "block4a_expand_conv",  # 28x28
+                "block2a_expand_activation",  # 56x56
+                "stem_activation",  # 112x112
+            ),
+        ),
         "efficientnetv2m": (
             ka.EfficientNetV2M,
             ka.efficientnet_v2.preprocess_input,
             (
                 "block6a_expand_conv",
                 "block4a_expand_conv",
-                "block2e_add",
-                "block1c_add",
+                "block2a_expand_activation",
+                "stem_activation",
+            ),
+        ),
+        "efficientnetv2l": (
+            ka.EfficientNetV2L,
+            ka.efficientnet_v2.preprocess_input,
+            (
+                "block6a_expand_conv",
+                "block4a_expand_conv",
+                "block2a_expand_activation",
+                "stem_activation",
             ),
         ),
     }

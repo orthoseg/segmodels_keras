@@ -111,7 +111,7 @@ DenseNet        ``'densenet121' 'densenet169' 'densenet201'``
 Inception       ``'inceptionv3' 'inceptionresnetv2'``
 MobileNet       ``'mobilenet' 'mobilenetv2'``
 EfficientNet    ``'efficientnetb0' 'efficientnetb1' 'efficientnetb2' 'efficientnetb3' 'efficientnetb4' 'efficientnetb5' 'efficientnetb6' 'efficientnetb7'``
-EfficientNetV2  ``'efficientnetv2m'``    
+EfficientNetV2  ``'efficientnetv2s' 'efficientnetv2m' 'efficientnetv2l'``    
 ==============  =====
 
 
