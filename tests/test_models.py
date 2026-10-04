@@ -31,6 +31,9 @@ def get_test_backbones():
             "inceptionresnetv2",
             "efficientnetb0",
             "efficientnetv2s",
+            "efficientnetv2s-ss",
+            "efficientnetv2m-ss",
+            "efficientnetv2l-ss",
         ]
     else:
         return get_available_backbone_names()
@@ -93,6 +96,43 @@ def test_get_model_invalid_name():
     """Test get_model with invalid model name."""
     with pytest.raises(ValueError, match="Unknown model name: invalid_model"):
         get_model("invalid_model")
+
+
+@pytest.mark.parametrize(
+    "standard_backbone, compact_backbone, expected_parameter_reduction",
+    [
+        ("efficientnetv2s", "efficientnetv2s-ss", 2_092_032),
+        ("efficientnetv2m", "efficientnetv2m-ss", 2_331_648),
+        ("efficientnetv2l", "efficientnetv2l-ss", 2_949_120),
+    ],
+)
+@keras_test
+def test_efficientnetv2_compact_skips_reduce_unet_parameters(
+    standard_backbone, compact_backbone, expected_parameter_reduction
+):
+    input_shape = (32, 32, 3)
+    standard_model = get_model(
+        "unet",
+        backbone_name=standard_backbone,
+        input_shape=input_shape,
+        encoder_weights=None,
+    )
+    standard_params = standard_model.count_params()
+    standard_output_shape = standard_model.output_shape
+    del standard_model
+    keras.backend.clear_session()
+
+    compact_model = get_model(
+        "unet",
+        backbone_name=compact_backbone,
+        input_shape=input_shape,
+        encoder_weights=None,
+    )
+
+    assert compact_model.output_shape == standard_output_shape
+    assert (
+        standard_params - compact_model.count_params() == expected_parameter_reduction
+    )
 
 
 def test_get_model_weights_notop_keras2():

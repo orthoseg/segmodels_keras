@@ -111,13 +111,20 @@ DenseNet        ``'densenet121' 'densenet169' 'densenet201'``
 Inception       ``'inceptionv3' 'inceptionresnetv2'``
 MobileNet       ``'mobilenet' 'mobilenetv2'``
 EfficientNet    ``'efficientnetb0' 'efficientnetb1' 'efficientnetb2' 'efficientnetb3' 'efficientnetb4' 'efficientnetb5' 'efficientnetb6' 'efficientnetb7'``
-EfficientNetV2  ``'efficientnetv2s' 'efficientnetv2m' 'efficientnetv2l'``    
+EfficientNetV2  ``'efficientnetv2s' 'efficientnetv2s-ss' 'efficientnetv2m'``
+                ``'efficientnetv2m-ss' 'efficientnetv2l' 'efficientnetv2l-ss'``
 ==============  =====
 
 
 .. epigraph::
     All backbones have weights trained on 2012 ILSVRC ImageNet dataset
     (``encoder_weights='imagenet'``).
+
+The backbones with the "-ss" suffix (small skips), e.g. ``'efficientnetv2s-ss'``, use
+lower-channel feature maps at the same spatial scales as their standard counterparts to
+reduce decoder parameters. Their segmentation-head weights are not interchangeable with
+those of the standard backbones; compare validation quality on your task before choosing
+a "small" variant.
 
 
 ***********
