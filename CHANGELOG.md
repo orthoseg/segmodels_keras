@@ -103,7 +103,7 @@
 ```python
 from segmentation_models.backbones import get_preprocessing
 
-preprocessing_fn = get_preprocessing('resnet34')
+preprocessing_fn = get_preprocessing("resnet34")
 X = preprocessing_fn(x)
 ```
 ###### API changes
