@@ -312,6 +312,46 @@ class BackbonesFactory:
         # "block3d_add" (64x64x64), "block2d_add" (128x128x48), "stem_activation"
         # (256x256x24)) showed that the decrease in model size was small (30 MB) but
         # the accuracy performance impact was significant (-1.5%).
+        "efficientnetv2b0": (
+            ka.EfficientNetV2B0,
+            ka.efficientnet_v2.preprocess_input,
+            (
+                "block4b_expand_conv",  # 32x32x384
+                "block3a_expand_conv",  # 64x64x128
+                "block2a_expand_activation",  # 128x128x64
+                "stem_activation",  # 256x256x32
+            ),
+        ),
+        "efficientnetv2b1": (
+            ka.EfficientNetV2B1,
+            ka.efficientnet_v2.preprocess_input,
+            (
+                "block4b_expand_conv",  # 32x32x384
+                "block3a_expand_conv",  # 64x64x128
+                "block2a_expand_activation",  # 128x128x64
+                "stem_activation",  # 256x256x32
+            ),
+        ),
+        "efficientnetv2b2": (
+            ka.EfficientNetV2B2,
+            ka.efficientnet_v2.preprocess_input,
+            (
+                "block4b_expand_conv",  # 32x32x416
+                "block3a_expand_conv",  # 64x64x128
+                "block2a_expand_activation",  # 128x128x64
+                "stem_activation",  # 256x256x32
+            ),
+        ),
+        "efficientnetv2b3": (
+            ka.EfficientNetV2B3,
+            ka.efficientnet_v2.preprocess_input,
+            (
+                "block4b_expand_conv",  # 32x32x448
+                "block3a_expand_conv",  # 64x64x160
+                "block2a_expand_activation",  # 128x128x64
+                "stem_activation",  # 256x256x40
+            ),
+        ),
         "efficientnetv2s": (
             ka.EfficientNetV2S,
             ka.efficientnet_v2.preprocess_input,

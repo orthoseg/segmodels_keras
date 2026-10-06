@@ -53,27 +53,9 @@ def keras_test(func):
     return wrapper
 
 
-@pytest.mark.parametrize("backbone_name", get_test_backbones())
-@pytest.mark.parametrize(
-    "model_name, input_shape, encoder_weights",
-    [
-        ("unet", None, None),
-        ("unet", None, "imagenet"),
-        ("unet", (256, 256, 4), None),
-        ("linknet", None, None),
-        ("linknet", (256, 256, 4), None),
-        ("pspnet", (384, 384, 4), None),
-        ("fpn", None, None),
-        ("fpn", (256, 256, 4), None),
-    ],
-)
-@keras_test
-def test_get_model(model_name, backbone_name, input_shape, encoder_weights):
-    """Test all segmentation models with different backbones.
-
-    input_shape=None means any shape (32x32 used in test), otherwise a fixed shape is
-    used.
-    """
+def _assert_get_model_output_shape(
+    model_name, backbone_name, input_shape, encoder_weights
+):
     n_channels = 3 if input_shape is None else input_shape[-1]
     test_shape = (1, 32, 32, n_channels) if input_shape is None else (1, *input_shape)
 
@@ -87,6 +69,32 @@ def test_get_model(model_name, backbone_name, input_shape, encoder_weights):
     y = model.predict(x)
 
     assert x.shape[:-1] == y.shape[:-1]
+
+
+@pytest.mark.parametrize("backbone_name", get_test_backbones())
+@keras_test
+def test_get_model_with_imagenet_weights(backbone_name):
+    """Test model creation with ImageNet-pretrained encoder weights."""
+    _assert_get_model_output_shape("unet", backbone_name, None, "imagenet")
+
+
+@pytest.mark.parametrize("backbone_name", get_available_backbone_names())
+@pytest.mark.parametrize(
+    "model_name, input_shape",
+    [
+        ("unet", None),
+        ("unet", (256, 256, 4)),
+        ("linknet", None),
+        ("linknet", (256, 256, 4)),
+        ("pspnet", (384, 384, 4)),
+        ("fpn", None),
+        ("fpn", (256, 256, 4)),
+    ],
+)
+@keras_test
+def test_get_model_without_imagenet_weights(model_name, backbone_name, input_shape):
+    """Test all model/backbone combinations without downloading pretrained weights."""
+    _assert_get_model_output_shape(model_name, backbone_name, input_shape, None)
 
 
 def test_get_model_invalid_name():
