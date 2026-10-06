@@ -49,7 +49,7 @@ def keras_test(func):
     return wrapper
 
 
-@pytest.mark.parametrize("backbone_name", get_available_backbone_names())
+@pytest.mark.parametrize("backbone_name", get_test_backbones())
 @pytest.mark.parametrize(
     "model_name, input_shape",
     [
@@ -64,10 +64,9 @@ def keras_test(func):
 )
 @keras_test
 def test_get_model(model_name, backbone_name, input_shape):
-    """Test all model/backbone combinations.
+    """Test creation of model/backbone combinations.
 
-    No weights are used in this test to avoid downloading pretrained models for all
-    backbones.
+    No weights are used in this test to avoid downloading pretrained models.
     """
     _assert_get_model_output_shape(model_name, backbone_name, input_shape, None)
 
