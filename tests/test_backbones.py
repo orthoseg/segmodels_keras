@@ -21,4 +21,3 @@ def test_get_backbone_unknown():
 
     with pytest.raises(ValueError):
         factory.get_backbone("unknown")
-

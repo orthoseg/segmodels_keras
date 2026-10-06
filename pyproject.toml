@@ -51,6 +51,7 @@ ignore = [
     ### Intentionally disabled
     "E402",     # Module level import not at top of file
     "PLR0913",  # Too many arguments to function call
+    "PLR0917",  # Too many positional arguments
     "PLR0911",  # Too many returns
     "PLR0912",  # Too many branches
     "PLR0915",  # Too many statements
