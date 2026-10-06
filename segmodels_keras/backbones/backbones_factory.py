@@ -307,6 +307,11 @@ class BackbonesFactory:
         # Stage layout differs from EfficientNet-Bx.
         # Skip layers selected to match decoder resolutions:
         # x16 -> x8 -> x4 -> x2
+        #
+        # Tests with more compact skip connection layers ("block5i_add" (32x32x160),
+        # "block3d_add" (64x64x64), "block2d_add" (128x128x48), "stem_activation"
+        # (256x256x24)) showed that the decrease in model size was small (30 MB) but
+        # the accuracy performance impact was significant (-1.5%).
         "efficientnetv2s": (
             ka.EfficientNetV2S,
             ka.efficientnet_v2.preprocess_input,
@@ -314,16 +319,6 @@ class BackbonesFactory:
                 "block6a_expand_conv",  # 32x32x960
                 "block4a_expand_conv",  # 64x64x256
                 "block2a_expand_activation",  # 128x128x96
-                "stem_activation",  # 256x256x24
-            ),
-        ),
-        "efficientnetv2s-ss": (
-            ka.EfficientNetV2S,
-            ka.efficientnet_v2.preprocess_input,
-            (
-                "block5i_add",  # 32x32x160
-                "block3d_add",  # 64x64x64
-                "block2d_add",  # 128x128x48
                 "stem_activation",  # 256x256x24
             ),
         ),
@@ -337,16 +332,6 @@ class BackbonesFactory:
                 "stem_activation",  # 256x256x24
             ),
         ),
-        "efficientnetv2m-ss": (
-            ka.EfficientNetV2M,
-            ka.efficientnet_v2.preprocess_input,
-            (
-                "block5n_add",  # 32x32x176
-                "block3e_add",  # 64x64x80
-                "block2e_add",  # 128x128x48
-                "stem_activation",  # 256x256x24
-            ),
-        ),
         "efficientnetv2l": (
             ka.EfficientNetV2L,
             ka.efficientnet_v2.preprocess_input,
@@ -354,16 +339,6 @@ class BackbonesFactory:
                 "block6a_expand_conv",  # 32x32x1344
                 "block4a_expand_conv",  # 64x64x384
                 "block2a_expand_activation",  # 128x128x128
-                "stem_activation",  # 256x256x32
-            ),
-        ),
-        "efficientnetv2l-ss": (
-            ka.EfficientNetV2L,
-            ka.efficientnet_v2.preprocess_input,
-            (
-                "block5s_add",  # 32x32x224
-                "block3g_add",  # 64x64x96
-                "block2g_add",  # 128x128x64
                 "stem_activation",  # 256x256x32
             ),
         ),
