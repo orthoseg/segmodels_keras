@@ -25,22 +25,18 @@ def str2bool(v):
 def get_test_backbones():
     is_full = str2bool(os.environ.get("FULL_TEST", "False"))
     if not is_full:
-        return [
-            "resnet34",
-            "resnet50",
-            "inceptionresnetv2",
-            "efficientnetb0",
-            "efficientnetv2s",
-        ]
+        return ["resnet34", "resnet50", "inceptionresnetv2", "efficientnetb0"]
     else:
         return get_available_backbone_names()
 
 
 def keras_test(func):
     """Function wrapper to clean up after TensorFlow tests.
-    # Arguments
+
+    Args:
         func: test function to clean up after.
-    # Returns
+
+    Returns:
         A function wrapping the input function.
     """
 
@@ -51,31 +47,6 @@ def keras_test(func):
         return output
 
     return wrapper
-
-
-def _assert_get_model_output_shape(
-    model_name, backbone_name, input_shape, encoder_weights
-):
-    n_channels = 3 if input_shape is None else input_shape[-1]
-    test_shape = (1, 32, 32, n_channels) if input_shape is None else (1, *input_shape)
-
-    x = np.ones(test_shape)
-    model = get_model(
-        model_name,
-        backbone_name=backbone_name,
-        input_shape=input_shape or (None, None, n_channels),
-        encoder_weights=encoder_weights,
-    )
-    y = model.predict(x)
-
-    assert x.shape[:-1] == y.shape[:-1]
-
-
-@pytest.mark.parametrize("backbone_name", get_test_backbones())
-@keras_test
-def test_get_model_with_imagenet_weights(backbone_name):
-    """Test model creation with ImageNet-pretrained encoder weights."""
-    _assert_get_model_output_shape("unet", backbone_name, None, "imagenet")
 
 
 @pytest.mark.parametrize("backbone_name", get_available_backbone_names())
@@ -92,9 +63,24 @@ def test_get_model_with_imagenet_weights(backbone_name):
     ],
 )
 @keras_test
-def test_get_model_without_imagenet_weights(model_name, backbone_name, input_shape):
-    """Test all model/backbone combinations without downloading pretrained weights."""
+def test_get_model(model_name, backbone_name, input_shape):
+    """Test all model/backbone combinations.
+
+    No weights are used in this test to avoid downloading pretrained models for all
+    backbones.
+    """
     _assert_get_model_output_shape(model_name, backbone_name, input_shape, None)
+
+
+@pytest.mark.parametrize("backbone_name", get_test_backbones())
+@keras_test
+def test_get_model_with_imagenet_weights(backbone_name):
+    """Test model creation with ImageNet-pretrained encoder weights.
+
+    Only tested on a limited set of backbones as this will download the pretrained
+    weights.
+    """
+    _assert_get_model_output_shape("unet", backbone_name, None, "imagenet")
 
 
 def test_get_model_invalid_name():
@@ -121,5 +107,19 @@ def test_get_model_weights_notop_keras3():
     assert len(model.layers) > 0
 
 
-if __name__ == "__main__":
-    pytest.main([__file__])
+def _assert_get_model_output_shape(
+    model_name, backbone_name, input_shape, encoder_weights
+):
+    n_channels = 3 if input_shape is None else input_shape[-1]
+    test_shape = (1, 32, 32, n_channels) if input_shape is None else (1, *input_shape)
+
+    x = np.ones(test_shape)
+    model = get_model(
+        model_name,
+        backbone_name=backbone_name,
+        input_shape=input_shape or (None, None, n_channels),
+        encoder_weights=encoder_weights,
+    )
+    y = model.predict(x)
+
+    assert x.shape[:-1] == y.shape[:-1]
