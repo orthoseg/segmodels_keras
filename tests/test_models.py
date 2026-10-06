@@ -22,8 +22,12 @@ def str2bool(v):
     return v.lower() in ("yes", "true", "t", "1")
 
 
-def get_test_backbones():
-    is_full = str2bool(os.environ.get("FULL_TEST", "False"))
+def get_test_backbones(with_weights: bool):
+    if with_weights:
+        is_full = str2bool(os.environ.get("FULL_TEST", "False"))
+    else:
+        is_full = str2bool(os.environ.get("FULL_TEST_WEIGHTS", "False"))
+
     if not is_full:
         return ["resnet34", "resnet50", "inceptionresnetv2", "efficientnetb0"]
     else:
@@ -49,7 +53,7 @@ def keras_test(func):
     return wrapper
 
 
-@pytest.mark.parametrize("backbone_name", get_test_backbones())
+@pytest.mark.parametrize("backbone_name", get_test_backbones(with_weights=False))
 @pytest.mark.parametrize(
     "model_name, input_shape",
     [
@@ -71,7 +75,7 @@ def test_get_model(model_name, backbone_name, input_shape):
     _assert_get_model_output_shape(model_name, backbone_name, input_shape, None)
 
 
-@pytest.mark.parametrize("backbone_name", get_test_backbones())
+@pytest.mark.parametrize("backbone_name", get_test_backbones(with_weights=True))
 @keras_test
 def test_get_model_with_imagenet_weights(backbone_name):
     """Test model creation with ImageNet-pretrained encoder weights.
