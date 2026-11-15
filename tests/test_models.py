@@ -24,9 +24,9 @@ def str2bool(v):
 
 def get_test_backbones(with_weights: bool):
     if with_weights:
-        is_full = str2bool(os.environ.get("FULL_TEST", "False"))
-    else:
         is_full = str2bool(os.environ.get("FULL_TEST_WEIGHTS", "False"))
+    else:
+        is_full = str2bool(os.environ.get("FULL_TEST", "False"))
 
     if not is_full:
         return ["resnet34", "resnet50", "inceptionresnetv2", "efficientnetb0"]
